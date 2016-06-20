@@ -30,10 +30,10 @@ trait DynamicFilterTrait
         '!=*' => ['value' => '!=*', 'name' => 'Does not begin with'],
         '*=' => ['value' => '*=', 'name' => 'Ends with'],
         '*!=' => ['value' => '*!=', 'name' => 'Does not end with'],
-        'IN' => ['value' => 'IN', 'name' => 'In...'],
-        'NOT_IN' => ['value' => 'NOT_IN', 'name' => 'Not in...'],
-        'EMPTY' => ['value' => 'EMPTY', 'name' => 'Is empty'],
-        'NOT_EMPTY' => ['value' => 'NOT_EMPTY', 'name' => 'Is not empty']
+        //'IN' => ['value' => 'IN', 'name' => 'In...'],
+        //'NOT_IN' => ['value' => 'NOT_IN', 'name' => 'Not in...'],
+        //'EMPTY' => ['value' => 'EMPTY', 'name' => 'Is empty'],
+        //'NOT_EMPTY' => ['value' => 'NOT_EMPTY', 'name' => 'Is not empty']
     ];
 
     /**
@@ -47,8 +47,8 @@ trait DynamicFilterTrait
         '>=' => ['value' => '>=', 'name' => 'Greater than and equal to'],
         '<=' => ['value' => '<=', 'name' => 'Less than and equal to'],
         '<' => ['value' => '<', 'name' => 'Less than'],
-        'IN' => ['value' => 'IN', 'name' => 'In...'],
-        'NOT_IN' => ['value' => 'NOT_IN', 'name' => 'Not in...'],
+        //'IN' => ['value' => 'IN', 'name' => 'In...'],
+        //'NOT_IN' => ['value' => 'NOT_IN', 'name' => 'Not in...'],
     ];
 
     /**
@@ -56,6 +56,7 @@ trait DynamicFilterTrait
      * @var array
      */
     protected static $date_operators = [
+        // @todo
     ];
 
     /**
@@ -176,7 +177,10 @@ trait DynamicFilterTrait
                         $filters[] = 'is <em>'.strtolower(static::getFilterOperators($filter_settings['filter'], $value[0])['name']).'</em>';
                     }
                     // String or number
-                    elseif (!empty(trim($value[1]))) {
+                    elseif (!empty($value[1])) {
+                        if (is_array($value[1])) {
+                            $value[1] = implode(',', $value[1]);
+                        }
                         $filters[] = '<em>'.strtolower(static::getFilterOperators($filter_settings['filter'], $value[0])['name']).'</em> <strong>'.$value[1].'</strong>';
                     } 
                 }
@@ -274,6 +278,9 @@ trait DynamicFilterTrait
                     if (!empty(trim($value1))) {
                         $query = $model->applyNumberFilter($query, $filter_setting, $operator, $value1);
                     }
+                    break;
+                case 'list':
+                    $query = $model->applyListFilter($query, $filter_setting, $operator, $value1);
                     break;
                 case 'boolean':
                     $query = $model->applyBooleanFilter($query, $filter_setting, $operator);
@@ -397,16 +404,15 @@ trait DynamicFilterTrait
      * @param string $value
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    private function applyListFilter($query, $filter_settings, $operator)
+    private function applyListFilter($query, $filter_settings, $operator, $value)
     {
-        $value = '';
-        if ($this->validateBooleanOperators($operator, $value)) {
+        if ($this->validateListOperators($operator, $value)) {
             if (is_array($filter_settings['attribute'])) {  
-                $query->where(function($sub_query) use ($filter_settings, $operator, $value) {
-                    return $this->applyFilterAttributeArray($sub_query, $filter_settings['attribute'], $operator, $value);
+                $query->{$operator}(function($sub_query) use ($filter_settings, $value) {
+                    return $this->applyFilterAttributeArray($sub_query, $filter_settings['attribute'], $value);
                 });
             } else {
-                $query->where($filter_settings['attribute'], $operator);
+                $query->{$operator}($filter_settings['attribute'], $value);
             }
         }
         return $query;
@@ -423,11 +429,11 @@ trait DynamicFilterTrait
     {
         switch ($operator) {
             case 'IN':
-                $operator = 'IN';
+                $operator = 'whereIn';
                 return true;
                 break;
             case 'NOT_IN':
-                $operator = 'NOT IN';
+                $operator = 'whereNotIn';
                 return true;
                 break;
         }
