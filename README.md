@@ -46,10 +46,10 @@ class User extends Model
             'search_tab_only' => true,
             'with' => 'organization'
         ],
-        'first_name' => ['name' => 'Name', 'attribute' => 'first_name', 'filter' => 'string'],
-        'last_name' => ['name' => 'Name', 'attribute' => 'last_name', 'filter' => 'string'],
+        'first_name' => ['name' => 'First name', 'attribute' => 'first_name', 'filter' => 'string'],
+        'last_name' => ['name' => 'Last name', 'attribute' => 'last_name', 'filter' => 'string'],
         'email' => ['name' => 'Email', 'attribute' => 'email', 'filter' => 'string'],
-        'is_active' => ['name' => 'Email', 'attribute' => 'is_active', 'filter' => 'boolean']
+        'is_active' => ['name' => 'Active user', 'attribute' => 'is_active', 'filter' => 'boolean']
     ];
 }
 ```
