@@ -107,6 +107,7 @@ trait DynamicFilterTrait
     /**
      * Return the delcared attributes on this model.
      * 
+     * @param boolean $first_call
      * @return array
      */
     public static function getFilterAttributes($first_call = true)
@@ -163,6 +164,7 @@ trait DynamicFilterTrait
     /**
      * Return a text list of the applied filters.
      *
+     * @param array $search_filters
      * @return array
      */
     public static function getAppliedFiltersArray($search_filters)
@@ -193,8 +195,10 @@ trait DynamicFilterTrait
     }
 
     /**
-     * Applies the filters to the model (and model's relationships)
+     * Applies the filters to the model (and model's relationships).
      * 
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param array $search_filters
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeApplyAttributeFilters($query, $search_filters)
@@ -249,6 +253,9 @@ trait DynamicFilterTrait
     /**
      * Applies the filters to the builder query.
      * 
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param array $filter_settings
+     * @param array $filter_requests
      * @return \Illuminate\Database\Eloquent\Builder
      */
     private static function processAttributeFilter($query, $filter_setting, $filter_requests)
@@ -298,7 +305,7 @@ trait DynamicFilterTrait
      * 
      * @param \Illuminate\Database\Eloquent\Builder $query
      * @param array $filter_settings
-     * @param array $operator
+     * @param string $operator
      * @param string $value
      * @return \Illuminate\Database\Eloquent\Builder
      */
@@ -356,7 +363,7 @@ trait DynamicFilterTrait
      * 
      * @param \Illuminate\Database\Eloquent\Builder $query
      * @param array $filter_settings
-     * @param array $operator
+     * @param string $operator
      * @param string $value
      * @return \Illuminate\Database\Eloquent\Builder
      */
@@ -400,8 +407,8 @@ trait DynamicFilterTrait
      * 
      * @param \Illuminate\Database\Eloquent\Builder $query
      * @param array $filter_settings
-     * @param array $operator
-     * @param string $value
+     * @param string $operator
+     * @param array $value
      * @return \Illuminate\Database\Eloquent\Builder
      */
     private function applyListFilter($query, $filter_settings, $operator, $value)
@@ -422,7 +429,7 @@ trait DynamicFilterTrait
      * Validate the provided list filter option.
      *
      * @param  string &$operator
-     * @param  string &$value
+     * @param  array &$value
      * @return boolean
      */
     private function validateListOperators(&$operator, &$value)
@@ -446,7 +453,6 @@ trait DynamicFilterTrait
      * @param \Illuminate\Database\Eloquent\Builder $query
      * @param array $filter_settings
      * @param array $operator
-     * @param string $value
      * @return \Illuminate\Database\Eloquent\Builder
      */
     private function applyBooleanFilter($query, $filter_settings, $operator)
@@ -492,7 +498,7 @@ trait DynamicFilterTrait
      * Apply the filter using multiple attributes.
      *
      * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param array $filter_settings
+     * @param array $attribute_list
      * @param array $operator
      * @param string $value
      * @return \Illuminate\Database\Eloquent\Builder
@@ -512,7 +518,8 @@ trait DynamicFilterTrait
     /**
      * Get an string|number|date operators as array|string.
      *
-     * @param  $type string|number|date
+     * @param  string|number|date $type 
+     * @param  boolean $operator
      * @return array|string|null
      */
     public static function getFilterOperators($type, $operator = false)
