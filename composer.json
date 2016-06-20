@@ -20,7 +20,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Bluora\\LarvelModelDynamicFilter\\": "src/"
+            "Bluora\\LaravelModelDynamicFilter\\": "src/"
         }
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace Bluora\LarvelModelDynamicFilter;
+namespace Bluora\LaravelModelDynamicFilter;
 
 trait DynamicFilterTrait
 {
