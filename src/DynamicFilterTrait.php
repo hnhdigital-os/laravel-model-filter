@@ -32,10 +32,12 @@ trait DynamicFilterTrait
         '!=*' => ['value' => '!=*', 'name' => 'Does not begin with'],
         '*=' => ['value' => '*=', 'name' => 'Ends with'],
         '*!=' => ['value' => '*!=', 'name' => 'Does not end with'],
-        //'IN' => ['value' => 'IN', 'name' => 'In...'],
-        //'NOT_IN' => ['value' => 'NOT_IN', 'name' => 'Not in...'],
+        'IN' => ['value' => 'IN', 'name' => 'In...', 'helper' => 'Separated by semi-colon'],
+        'NOT_IN' => ['value' => 'NOT_IN', 'name' => 'Not in...', 'helper' => 'Separated by semi-colon'],
         'EMPTY' => ['value' => 'EMPTY', 'name' => 'Empty'],
-        'NOT_EMPTY' => ['value' => 'NOT_EMPTY', 'name' => 'Not empty']
+        'NOT_EMPTY' => ['value' => 'NOT_EMPTY', 'name' => 'Not empty'],
+        'NULL' => ['value' => 'NULL', 'name' => 'NULL'],
+        'NOT_NULL' => ['value' => 'NOT_NULL', 'name' => 'Not NULL']
     ];
 
     /**
@@ -49,8 +51,8 @@ trait DynamicFilterTrait
         '>=' => ['value' => '>=', 'name' => 'Greater than and equal to'],
         '<=' => ['value' => '<=', 'name' => 'Less than and equal to'],
         '<' => ['value' => '<', 'name' => 'Less than'],
-        //'IN' => ['value' => 'IN', 'name' => 'In...'],
-        //'NOT_IN' => ['value' => 'NOT_IN', 'name' => 'Not in...'],,
+        'IN' => ['value' => 'IN', 'name' => 'In...', 'helper' => 'Separated by semi-colon'],
+        'NOT_IN' => ['value' => 'NOT_IN', 'name' => 'Not in...', 'helper' => 'Separated by semi-colon'],
         'EMPTY' => ['value' => 'EMPTY', 'name' => 'Empty'],
         'NOT_EMPTY' => ['value' => 'NOT_EMPTY', 'name' => 'Not empty']
     ];
@@ -294,6 +296,51 @@ trait DynamicFilterTrait
             (!isset($filter_request[2])) ? $filter_request[2] = '' : false;
             list($operator, $value1, $value2) = $filter_request;
 
+            // User can override the field being checked
+            if ($value1[0] === '#' && isset($model->attribute_rules)) {
+                $available_attributes = array_keys($model->attribute_rules);
+                $available_operators = array_keys($model->getFilterOperators('string'));
+                $value1_array = explode(' ', $value1);
+                $total_input = count($value1_array);
+
+                if ($total_input >= 2) {
+                    $override_attribute = array_shift($value1_array);
+                    $override_operator = array_shift($value1_array);
+                    $override_value1 = implode(' ', $value1_array);
+
+                    if ($total_input == 2
+                        && in_array($override_operator, ['EMPTY', 'NOT_EMPTY', 'NULL', 'NOT NULL'])) {
+                        $filter_setting['attribute'] = substr($override_attribute, 1);
+                        $operator = $override_operator;
+                        $value1 = '';
+                    } elseif ($total_input == 2) {
+                        $operator = '=';
+                        $value1 = $override_operator;
+
+                    } elseif ($total_input > 2 && in_array($override_operator, $available_operators)) {
+                        $filter_setting['attribute'] = substr($override_attribute, 1);
+                        $operator = $override_operator;
+                        $value1 = $override_value1;
+                    }
+                }
+            }
+
+            // User can override the operator inline
+            if (empty($operator) || $operator === '*=*') {
+                $value1_array = explode(' ', $value1);
+                $check_operator = array_shift($value1_array);
+                if (count($value1_array)) {
+                    $check_operator = trim($check_operator);
+                    if (!empty($check_operator)) {
+                        $available_operators = array_keys($model->getFilterOperators($filter_setting['filter']));
+                        if (in_array($check_operator, $available_operators)) {
+                            $operator = $check_operator;
+                            $value1 = implode(' ', $value1_array);
+                        }
+                    }
+                }
+            }
+
             // No operator provided, use the model default, or equals.
             if (empty($operator) && isset($model->filter_default_operator)) {
                 $operator = $model->filter_default_operator;
@@ -304,12 +351,12 @@ trait DynamicFilterTrait
             $attribute = $filter_setting['attribute'];
             $method = 'where';
             $arguments = [];
-            $positive = (stripos($operator, '!') !== false || stripos($operator, 'NOT') !== false);
+            $positive = !(stripos($operator, '!') !== false || stripos($operator, 'NOT') !== false);
 
-            if (static::validateOperators($filter_setting['filter'], $method, $arguments, $positive, $operator, $value1, $value2)) {
+            if (static::validateOperators($filter_setting['filter'], $method, $arguments, $operator, $value1, $value2)) {
                 if (is_array($attribute)) {  
-                    $query->where(function($sub_query) use ($attribute, $method, $arguments) {
-                        return static::applyFilterAttributeArray($sub_query, $attribute, $method, $arguments);
+                    $query->where(function($sub_query) use ($attribute, $method, $arguments, $positive) {
+                        return static::applyFilterAttributeArray($sub_query, $attribute, $method, $arguments, $positive);
                     });
                 } else {
                     if (is_array($arguments)) {
@@ -330,35 +377,36 @@ trait DynamicFilterTrait
      * @param  string &$method
      * @param  array &$arguments
      * @param  array $operator
-     * @param  array $value
+     * @param  array $value1
+     * @param  array $value2
      * @return boolean
      */
-    private static function validateOperators($filter, &$method, &$arguments, &$positive, $operator, $value)
+    private static function validateOperators($filter, &$method, &$arguments, $operator, $value1, $value2)
     {
         switch ($filter) {
             case 'string':
                 switch ($operator) {
                     case '=':
                     case '!=':
-                        $arguments = [$operator, $value];
+                        $arguments = [$operator, $value1];
                         return true;
                     case '*=*':
                     case '*!=*':
                         $operator = (stripos($operator, '!') !== false) ? 'NOT ' : '';
                         $operator .= 'LIKE';                
-                        $arguments = [$operator, '%'.$value.'%'];
+                        $arguments = [$operator, '%'.$value1.'%'];
                         return true;
                     case '*=':
                     case '*!=':
                         $operator = (stripos($operator, '!') !== false) ? 'NOT ' : '';
                         $operator .= 'LIKE';
-                        $arguments = [$operator, '%'.$value];
+                        $arguments = [$operator, '%'.$value1];
                         return true;
                     case '=*':
                     case '!=*':
                         $operator = (stripos($operator, '!') !== false) ? 'NOT ' : '';
                         $operator .= 'LIKE';
-                        $arguments = [$operator, $value.'%'];
+                        $arguments = [$operator, $value1.'%'];
                         return true;
                     case 'EMPTY':
                         $method = 'whereRaw';
@@ -367,6 +415,24 @@ trait DynamicFilterTrait
                     case 'NOT_EMPTY':
                         $method = 'whereRaw';
                         $arguments = "!=''";
+                        return true;
+                    case 'IN':
+                        $method = 'whereIn';
+                        $value1 = explode(';', $value1);
+                        $value1 = array_filter(array_map('trim', $value1));
+                        $arguments = [$value1];
+                        return true;
+                    case 'NOT_IN':
+                        $method = 'whereIn';
+                        $value1 = explode(';', $value1);
+                        $value1 = array_filter(array_map('trim', $value1));
+                        $arguments = [$value1];
+                        return true;
+                    case 'NULL':
+                        $method = 'whereNull';
+                        return true;
+                    case 'NOT_NULL':
+                        $method = 'whereNotNull';
                         return true;
                 }
                 break;
@@ -378,7 +444,7 @@ trait DynamicFilterTrait
                     case '>=':
                     case '<=':
                     case '<':
-                        $arguments = [$operator, $value];
+                        $arguments = [$operator, $value1];
                         return true;            
                     case 'EMPTY':
                         $method = 'whereRaw';
@@ -388,17 +454,29 @@ trait DynamicFilterTrait
                         $method = 'whereRaw';
                         $arguments = "!=''";
                         return true;
+                    case 'IN':
+                        $method = 'whereIn';
+                        $value1 = explode(';', $value1);
+                        $value1 = array_filter(array_map('trim', $value1));
+                        $arguments = [$value1];
+                        return true;
+                    case 'NOT_IN':
+                        $method = 'whereIn';
+                        $value1 = explode(';', $value1);
+                        $value1 = array_filter(array_map('trim', $value1));
+                        $arguments = [$value1];
+                        return true;
                 }
                 break;
             case 'list':
                 switch ($operator) {
                     case 'IN':
                         $method = 'whereIn';
-                        $arguments = [$value];
+                        $arguments = [$value1];
                         return true;
                     case 'NOT_IN':
                         $method = 'whereNotIn';
-                        $arguments = [$value];
+                        $arguments = [$value1];
                         return true;
                 }
                 break;
@@ -432,10 +510,17 @@ trait DynamicFilterTrait
     private static function applyFilterAttributeArray($query, $attribute_list, $method, $arguments, $positive = true)
     {
         if ($positive) {
-            $method = 'or'.$method;
+           $method = 'or'.$method;
         }
-        foreach ($attribute_list as $attribute_name) {
-            $query->$method(...$arguments);
+
+        foreach ($attribute_list as $attribute) {
+            $method_argument = $arguments;
+            if (is_array($method_argument)) {
+                array_unshift($method_argument, $attribute);
+            } else {
+                $method_argument = [$attribute.$method_argument];
+            }
+            $query->$method(...$method_argument);
         }
         return $query;
     }
