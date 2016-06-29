@@ -2,6 +2,8 @@
 
 namespace Bluora\LaravelModelDynamicFilter;
 
+use Illuminate\Database\Query\Expression;
+
 trait DynamicFilterTrait
 {
 
@@ -21,7 +23,7 @@ trait DynamicFilterTrait
      * String operators.
      * @var array
      */
-    protected static $string_operators = [
+    protected $string_operators = [
         '*=*' => ['value' => '*=*', 'name' => 'Contains'],
         '*!=*' => ['value' => '*!=*', 'name' => 'Not contain'],
         '=' => ['value' => '=', 'name' => 'Equals'],
@@ -32,15 +34,15 @@ trait DynamicFilterTrait
         '*!=' => ['value' => '*!=', 'name' => 'Does not end with'],
         //'IN' => ['value' => 'IN', 'name' => 'In...'],
         //'NOT_IN' => ['value' => 'NOT_IN', 'name' => 'Not in...'],
-        //'EMPTY' => ['value' => 'EMPTY', 'name' => 'Is empty'],
-        //'NOT_EMPTY' => ['value' => 'NOT_EMPTY', 'name' => 'Is not empty']
+        'EMPTY' => ['value' => 'EMPTY', 'name' => 'Empty'],
+        'NOT_EMPTY' => ['value' => 'NOT_EMPTY', 'name' => 'Not empty']
     ];
 
     /**
      * Number operators.
      * @var array
      */
-    protected static $number_operators = [
+    protected $number_operators = [
         '=' => ['value' => '=', 'name' => 'Equals'],
         '!=' => ['value' => '!=', 'name' => 'Not equals'],
         '>' => ['value' => '>', 'name' => 'Greater than'],
@@ -48,14 +50,16 @@ trait DynamicFilterTrait
         '<=' => ['value' => '<=', 'name' => 'Less than and equal to'],
         '<' => ['value' => '<', 'name' => 'Less than'],
         //'IN' => ['value' => 'IN', 'name' => 'In...'],
-        //'NOT_IN' => ['value' => 'NOT_IN', 'name' => 'Not in...'],
+        //'NOT_IN' => ['value' => 'NOT_IN', 'name' => 'Not in...'],,
+        'EMPTY' => ['value' => 'EMPTY', 'name' => 'Empty'],
+        'NOT_EMPTY' => ['value' => 'NOT_EMPTY', 'name' => 'Not empty']
     ];
 
     /**
      * Date operators.
      * @var array
      */
-    protected static $date_operators = [
+    protected $date_operators = [
         // @todo
     ];
 
@@ -63,7 +67,7 @@ trait DynamicFilterTrait
      * Boolean operators.
      * @var array
      */
-    protected static $boolean_operators = [
+    protected $boolean_operators = [
         '1' => ['value' => '1', 'name' => 'True'],
         '0' => ['value' => '0', 'name' => 'False'],
     ];
@@ -72,7 +76,7 @@ trait DynamicFilterTrait
      * List operators.
      * @var array
      */
-    protected static $list_operators = [
+    protected $list_operators = [
         'IN' => ['value' => 'IN', 'name' => 'In selected'],
         'NOT_IN' => ['value' => 'NOT_IN', 'name' => 'Not in selected'],
     ];
@@ -95,7 +99,7 @@ trait DynamicFilterTrait
      * 
      * @return array
      */
-    public function getFilterModelName()
+    public static function getFilterModelName()
     {
         $model = (new static);
         if (isset($model->filter_name)) {
@@ -113,9 +117,9 @@ trait DynamicFilterTrait
     public static function getFilterAttributes($first_call = true)
     {
         $model = (new static);
+
         if (isset($model->filter_attributes) && is_array($model->filter_attributes)) {
             $filters = $model->filter_attributes;
-
 
             foreach ($filters as $key => &$filter_setting) {
                 if (isset($filter_setting['name']) && isset($filter_setting['attribute']) && isset($filter_setting['filter'])) {
@@ -123,13 +127,28 @@ trait DynamicFilterTrait
                     $filter_setting['name'] = $model_name.': '.$filter_setting['name'];
                     $filter_setting['method'] = 'self';
                     $filter_setting['filter_name'] = $key;
+                    if (is_array($filter_setting['attribute'])) {
+                        foreach ($filter_setting['attribute'] as $key => &$value) {
+                            if ($value[0] === '{') {
+                                $value = new Expression(substr($value, 1));
+                            } elseif (strpos($value, '.') === false) {
+                                $value = $model->getTable().'.'.$value;
+                            }
+                        }
+                    } else {
+                        if ($filter_setting['attribute'][0] === '{') {
+                            $filter_setting['attribute'] = new Expression(substr($filter_setting['attribute'], 1));
+                        } elseif (strpos($filter_setting['attribute'], '.') === false) {
+                            $filter_setting['attribute'] = $model->getTable().'.'.$filter_setting['attribute'];
+                        }
+                    }
                 } else {
                     unset($filters[$key]);
                 }
                 unset($filter_setting);
             }
             if ($first_call) {
-                foreach (static::getFilterRelationships() as $method => $model_class) {
+                foreach ($model->getFilterRelationships() as $method => $model_class) {
                     if ($model_class !== static::class) {
                         $related_model = (new $model_class);
                         $model_filters = $related_model->getFilterAttributes(false);
@@ -152,7 +171,7 @@ trait DynamicFilterTrait
      * 
      * @return array
      */
-    public static function getFilterRelationships()
+    public function getFilterRelationships()
     {
         $model = (new static);
         if (isset($model->filter_relationships) && is_array($model->filter_relationships)) {
@@ -167,23 +186,24 @@ trait DynamicFilterTrait
      * @param array $search_filters
      * @return array
      */
-    public static function getAppliedFiltersArray($search_filters)
+    public function getAppliedFiltersArray($search_filters)
     {
+        $model = (new static);
         $result = [];
-        foreach (static::getFilterAttributes() as $filter_name => $filter_settings) {
+        foreach ($model->getFilterAttributes() as $filter_name => $filter_settings) {
             if (isset($search_filters[$filter_name]) && is_array($search_filters[$filter_name])) {
                 $filters = [];
                 foreach ($search_filters[$filter_name] as $value) {
                     // Boolean
                     if (empty($value[1])) {
-                        $filters[] = 'is <em>'.strtolower(static::getFilterOperators($filter_settings['filter'], $value[0])['name']).'</em>';
+                        $filters[] = 'is <em>'.strtolower($model->getFilterOperators($filter_settings['filter'], $value[0])['name']).'</em>';
                     }
                     // String or number
                     elseif (!empty($value[1])) {
                         if (is_array($value[1])) {
                             $value[1] = implode(',', $value[1]);
                         }
-                        $filters[] = '<em>'.strtolower(static::getFilterOperators($filter_settings['filter'], $value[0])['name']).'</em> <strong>'.$value[1].'</strong>';
+                        $filters[] = '<em>'.strtolower($model->getFilterOperators($filter_settings['filter'], $value[0])['name']).'</em> <strong>'.$value[1].'</strong>';
                     } 
                 }
                 if (count($filters)) {
@@ -206,7 +226,7 @@ trait DynamicFilterTrait
         if (is_array($search_filters) && !empty($search_filters)) {
 
             // Get available filters
-            $filter_attributes = static::getFilterAttributes();
+            $filter_attributes = $this->getFilterAttributes();
             $total_relationship_models = 0;
 
             // Group the filters by the the model's relationship method.
@@ -217,8 +237,15 @@ trait DynamicFilterTrait
                     $method_name = (count($source) == 1) ? 'self' : $source[0];
                     //$filter_name = ($method_name === 'self') ? $filter_name : $source[1];
                     $filters_by_model[$method_name][$filter_name] = $filters;
+
+                    // Count the number of lookups against other models that we need to do.
                     if ($method_name !== 'self') {
                         $total_relationship_models++;
+                    }
+
+                    // Include the relevant relationships for this filter.
+                    elseif (isset($filter_attributes[$filter_name]['with'])) {
+                        $query->modelJoin($filter_attributes[$filter_name]['with']);
                     }
                 }
             }
@@ -226,14 +253,14 @@ trait DynamicFilterTrait
             // Filters provided include fields against other models
             // Attach the model and limit that by the search filters provided.
             if ($total_relationship_models) {
-                $relationships = static::getFilterRelationships();
+                $relationships = $this->getFilterRelationships();
                 $query_connections = [];
                 foreach ($relationships as $method_name => $model_class) {
                     if (isset($filters_by_model[$method_name])) {
                         $filters = $filters_by_model[$method_name];
                         $query->whereHas($method_name, function($query) use ($filter_attributes, $filters) {
                             foreach ($filters as $filter_name => $filter_requests) {
-                                static::processAttributeFilter($query, $filter_attributes[$filter_name], $filter_requests);
+                                $this->processAttributeFilter($query, $filter_attributes[$filter_name], $filter_requests);
                             }
                         });
                     }
@@ -243,7 +270,7 @@ trait DynamicFilterTrait
             // Process direct filters to this model.
             if (isset($filters_by_model['self'])) {
                 foreach ($filters_by_model['self'] as $filter_name => $filters) {
-                    $query = static::processAttributeFilter($query, $filter_attributes[$filter_name], $filters);
+                    $query = $this->processAttributeFilter($query, $filter_attributes[$filter_name], $filters);
                 }
             }
         }
@@ -268,227 +295,126 @@ trait DynamicFilterTrait
             list($operator, $value1, $value2) = $filter_request;
 
             // No operator provided, use the model default, or equals.
-            if (empty($operator) && isset($this->filter_default_operator)) {
-                $operator = $this->filter_default_operator;
+            if (empty($operator) && isset($model->filter_default_operator)) {
+                $operator = $model->filter_default_operator;
             } elseif (empty($operator)) {
                 $operator = '=';
             }
 
-            // Select filter for this attribute
-            switch ($filter_setting['filter']) {
-                case 'string':
-                    if (!empty(trim($value1))) {
-                        $query = $model->applyStringFilter($query, $filter_setting, $operator, $value1);
-                    }
-                    break;
-                case 'number':
-                    if (!empty(trim($value1))) {
-                        $query = $model->applyNumberFilter($query, $filter_setting, $operator, $value1);
-                    }
-                    break;
-                case 'list':
-                    $query = $model->applyListFilter($query, $filter_setting, $operator, $value1);
-                    break;
-                case 'boolean':
-                    $query = $model->applyBooleanFilter($query, $filter_setting, $operator);
-                    break;
-                case 'datetime':
-                    // @todo
-                    break;
+            $attribute = $filter_setting['attribute'];
+            $method = 'where';
+            $arguments = [];
+            $positive = (stripos($operator, '!') !== false || stripos($operator, 'NOT') !== false);
+
+            if (static::validateOperators($filter_setting['filter'], $method, $arguments, $positive, $operator, $value1, $value2)) {
+                if (is_array($attribute)) {  
+                    $query->where(function($sub_query) use ($attribute, $method, $arguments) {
+                        return static::applyFilterAttributeArray($sub_query, $attribute, $method, $arguments);
+                    });
+                } else {
+                    if (is_array($arguments)) {
+                        array_unshift($arguments, $attribute);
+                        $query->$method(...$arguments);
+                    } else {
+                        $query->$method($attribute.$arguments);
+                    }                
+                }
             }
         }
         return $query;
     }
 
     /**
-     * Apply the string filter.
-     * 
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param array $filter_settings
-     * @param string $operator
-     * @param string $value
-     * @return \Illuminate\Database\Eloquent\Builder
-     */
-    private function applyStringFilter($query, $filter_settings, $operator, $value)
-    {   
-        if ($this->validateStringOperators($operator, $value)) {
-            if (is_array($filter_settings['attribute'])) {  
-                $query->where(function($sub_query) use ($filter_settings, $value, $operator) {
-                    return $this->applyFilterAttributeArray($sub_query, $filter_settings['attribute'], $operator, $value);
-                });
-            } else {
-                $query->where($filter_settings['attribute'], $operator, $value);
-            }
-        }
-        return $query;
-    }
-
-    /**
-     * Validate the provided string filter option.
+     * Validate the provided filter option.
      *
-     * @param  string &$operator
-     * @param  string &$value
+     * @param  string &$method
+     * @param  array &$arguments
+     * @param  array $operator
+     * @param  array $value
      * @return boolean
      */
-    private function validateStringOperators(&$operator, &$value)
+    private static function validateOperators($filter, &$method, &$arguments, &$positive, $operator, $value)
     {
-        switch ($operator) {
-            case '=':
-            case '!=':
-                return true;
-            case '*=*':
-            case '*!=*':
-                $value = '%'.$value.'%';
-                $operator = (stripos($operator, '!') !== false) ? 'NOT ' : '';
-                $operator .= 'LIKE';
-                return true;
-            case '*=':
-            case '*!=':
-                $value = '%'.$value;
-                $operator = (stripos($operator, '!') !== false) ? 'NOT ' : '';
-                $operator .= 'LIKE';
-                return true;
-            case '=*':
-            case '!=*':
-                $value = $value.'%';
-                $operator = (stripos($operator, '!') !== false) ? 'NOT ' : '';
-                $operator .= 'LIKE';
-                return true;
-        }
-        return false;
-    }
-
-    /**
-     * Apply the number filter.
-     * 
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param array $filter_settings
-     * @param string $operator
-     * @param string $value
-     * @return \Illuminate\Database\Eloquent\Builder
-     */
-    private function applyNumberFilter($query, $filter_settings, $operator, $value)
-    {   
-        if ($this->validateNumberOperators($operator, $value)) {
-            if (is_array($filter_settings['attribute'])) {  
-                $query->where(function($sub_query) use ($filter_settings, $operator, $value) {
-                    return $this->applyFilterAttributeArray($sub_query, $filter_settings['attribute'], $operator, $value);
-                });
-            } else {
-                $query->where($filter_settings['attribute'], $operator, $value);
-            }
-        }
-        return $query;
-    }
-
-    /**
-     * Validate the provided number filter option.
-     *
-     * @param  string &$operator
-     * @param  string &$value
-     * @return boolean
-     */
-    private function validateNumberOperators(&$operator, &$value)
-    {
-        switch ($operator) {
-            case '=':
-            case '!=':
-            case '>':
-            case '>=':
-            case '<=':
-            case '<':
-                return true;
-        }
-        return false;
-    }
-
-    /**
-     * Apply the list filter.
-     * 
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param array $filter_settings
-     * @param string $operator
-     * @param array $value
-     * @return \Illuminate\Database\Eloquent\Builder
-     */
-    private function applyListFilter($query, $filter_settings, $operator, $value)
-    {
-        if ($this->validateListOperators($operator, $value)) {
-            if (is_array($filter_settings['attribute'])) {  
-                $query->{$operator}(function($sub_query) use ($filter_settings, $value) {
-                    return $this->applyFilterAttributeArray($sub_query, $filter_settings['attribute'], $value);
-                });
-            } else {
-                $query->{$operator}($filter_settings['attribute'], $value);
-            }
-        }
-        return $query;
-    }
-
-    /**
-     * Validate the provided list filter option.
-     *
-     * @param  string &$operator
-     * @param  array &$value
-     * @return boolean
-     */
-    private function validateListOperators(&$operator, &$value)
-    {
-        switch ($operator) {
-            case 'IN':
-                $operator = 'whereIn';
-                return true;
+        switch ($filter) {
+            case 'string':
+                switch ($operator) {
+                    case '=':
+                    case '!=':
+                        $arguments = [$operator, $value];
+                        return true;
+                    case '*=*':
+                    case '*!=*':
+                        $operator = (stripos($operator, '!') !== false) ? 'NOT ' : '';
+                        $operator .= 'LIKE';                
+                        $arguments = [$operator, '%'.$value.'%'];
+                        return true;
+                    case '*=':
+                    case '*!=':
+                        $operator = (stripos($operator, '!') !== false) ? 'NOT ' : '';
+                        $operator .= 'LIKE';
+                        $arguments = [$operator, '%'.$value];
+                        return true;
+                    case '=*':
+                    case '!=*':
+                        $operator = (stripos($operator, '!') !== false) ? 'NOT ' : '';
+                        $operator .= 'LIKE';
+                        $arguments = [$operator, $value.'%'];
+                        return true;
+                    case 'EMPTY':
+                        $method = 'whereRaw';
+                        $arguments = "=''";
+                        return true;
+                    case 'NOT_EMPTY':
+                        $method = 'whereRaw';
+                        $arguments = "!=''";
+                        return true;
+                }
                 break;
-            case 'NOT_IN':
-                $operator = 'whereNotIn';
-                return true;
+            case 'number':
+                switch ($operator) {
+                    case '=':
+                    case '!=':
+                    case '>':
+                    case '>=':
+                    case '<=':
+                    case '<':
+                        $arguments = [$operator, $value];
+                        return true;            
+                    case 'EMPTY':
+                        $method = 'whereRaw';
+                        $arguments = "=''";
+                        return true;
+                    case 'NOT_EMPTY':
+                        $method = 'whereRaw';
+                        $arguments = "!=''";
+                        return true;
+                }
                 break;
-        }
-        return false;
-    }
-
-    /**
-     * Apply the boolean filter.
-     * 
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param array $filter_settings
-     * @param array $operator
-     * @return \Illuminate\Database\Eloquent\Builder
-     */
-    private function applyBooleanFilter($query, $filter_settings, $operator)
-    {
-        $value = '';
-        if ($this->validateBooleanOperators($operator, $value)) {
-            if (is_array($filter_settings['attribute'])) {  
-                $query->where(function($sub_query) use ($filter_settings, $operator, $value) {
-                    return $this->applyFilterAttributeArray($sub_query, $filter_settings['attribute'], $operator, $value);
-                });
-            } else {
-                $query->where($filter_settings['attribute'], $operator);
-            }
-        }
-        return $query;
-    }
-
-    /**
-     * Validate the provided boolean filter option.
-     *
-     * @param  string &$operator
-     * @param  string &$value
-     * @return boolean
-     */
-    private function validateBooleanOperators(&$operator, &$value)
-    {
-        switch ($operator) {
-            case '1':
-                $operator = '=';
-                $value = '1';
-                return true;
+            case 'list':
+                switch ($operator) {
+                    case 'IN':
+                        $method = 'whereIn';
+                        $arguments = [$value];
+                        return true;
+                    case 'NOT_IN':
+                        $method = 'whereNotIn';
+                        $arguments = [$value];
+                        return true;
+                }
                 break;
-            case '0':
-                $operator = '!=';
-                $value = '0';
-                return true;
+            case 'boolean':
+                switch ($operator) {
+                    case 1:
+                    case '1':
+                        $arguments = ['=', '1'];
+                        return true;
+                        break;
+                    case 0:
+                    case '0':
+                        $arguments = ['=', '0'];
+                        return true;
+                        break;
+                }
                 break;
         }
         return false;
@@ -503,14 +429,13 @@ trait DynamicFilterTrait
      * @param string $value
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    private function applyFilterAttributeArray($query, $attribute_list, $operator, $value)
+    private static function applyFilterAttributeArray($query, $attribute_list, $method, $arguments, $positive = true)
     {
+        if ($positive) {
+            $method = 'or'.$method;
+        }
         foreach ($attribute_list as $attribute_name) {
-            if (stripos($operator, 'NOT') === false && stripos($operator, '!') === false) {
-                $query->orWhere($attribute_name, $operator, $value);
-            } else {
-                $query->where($attribute_name, $operator, $value);
-            }
+            $query->$method(...$arguments);
         }
         return $query;
     }
@@ -522,14 +447,61 @@ trait DynamicFilterTrait
      * @param  boolean $operator
      * @return array|string|null
      */
-    public static function getFilterOperators($type, $operator = false)
+    public function getFilterOperators($type, $operator = false)
     {
         $source = $type.'_operators';
-        if ($operator !== false && isset(static::$$source[$operator])) {
-            return static::$$source[$operator];
+        if ($operator !== false && isset($this->$source[$operator])) {
+            return $this->$source[$operator];
         } elseif ($operator !== false) {
             return null;
         }
-        return static::$$source;
+        return $this->$source;
     }
+
+    /**
+     * This determines the foreign key relations automatically to prevent the need to figure out the columns.
+     *
+     * @param \Illuminate\Database\Query\Builder $query
+     * @param string $relation_name
+     * @param string $operator
+     * @param string $type
+     * @param bool   $where
+     * @return \Illuminate\Database\Query\Builder
+     */
+    public function scopeModelJoin($query, $relation_name, $operator = '=', $type = 'left', $where = false)
+    {
+        $relation = $this->$relation_name();
+        $table = $relation->getRelated()->getTable();
+        $qualified_parent_key_name = $relation->getQualifiedParentKeyName();
+        $foreign_key = $relation->getForeignKey();
+
+        if (empty($query->columns)) {
+            $query->select($this->getTable().".*");
+        }
+
+        foreach (\Schema::getColumnListing($table) as $related_column) {
+            $query->addSelect(new Expression("`$table`.`$related_column` AS `$table.$related_column`"));
+        }
+
+        return $query->join($table, $qualified_parent_key_name, $operator, $foreign_key, $type, $where);
+    }
+
+    /**
+     * Limit the current query.
+     *
+     * @param \Illuminate\Database\Query\Builder $query
+     * @param  array $search_filters
+     * @return \Illuminate\Database\Query\Builder
+     */
+    public function scopeLimit($query, $search_filters)
+    {
+        if (isset($search_filters['skip']) && $search_filters['skip'] > 0) {
+            $query->skip($search_filters['skip']);
+        }
+        if (isset($search_filters['take']) && $search_filters['take'] > 0) {
+            $query->take($search_filters['take']);
+        }
+        return $query;
+    }
+
 }
