@@ -2,6 +2,7 @@
 
 namespace Bluora\LaravelModelDynamicFilter;
 
+use DB;
 use Illuminate\Database\Query\Expression;
 
 trait DynamicFilterTrait
@@ -247,7 +248,7 @@ trait DynamicFilterTrait
 
                     // Include the relevant relationships for this filter.
                     elseif (isset($filter_attributes[$filter_name]['with'])) {
-                        $query->modelJoin($filter_attributes[$filter_name]['with']);
+                        $query = $query->modelJoin($filter_attributes[$filter_name]['with']);
                     }
                 }
             }
@@ -260,7 +261,7 @@ trait DynamicFilterTrait
                 foreach ($relationships as $method_name => $model_class) {
                     if (isset($filters_by_model[$method_name])) {
                         $filters = $filters_by_model[$method_name];
-                        $query->whereHas($method_name, function($query) use ($filter_attributes, $filters) {
+                        $query = $query->whereHas($method_name, function($query) use ($filter_attributes, $filters) {
                             foreach ($filters as $filter_name => $filter_requests) {
                                 $this->processAttributeFilter($query, $filter_attributes[$filter_name], $filter_requests);
                             }
@@ -355,15 +356,15 @@ trait DynamicFilterTrait
 
             if (static::validateOperators($filter_setting['filter'], $method, $arguments, $operator, $value1, $value2)) {
                 if (is_array($attribute)) {  
-                    $query->where(function($sub_query) use ($attribute, $method, $arguments, $positive) {
+                    $query = $query->where(function($sub_query) use ($attribute, $method, $arguments, $positive) {
                         return static::applyFilterAttributeArray($sub_query, $attribute, $method, $arguments, $positive);
                     });
                 } else {
                     if (is_array($arguments)) {
                         array_unshift($arguments, $attribute);
-                        $query->$method(...$arguments);
+                        $query = $query->$method(...$arguments);
                     } else {
-                        $query->$method($attribute.$arguments);
+                        $query = $query->$method($attribute.$arguments);
                     }                
                 }
             }
@@ -520,7 +521,7 @@ trait DynamicFilterTrait
             } else {
                 $method_argument = [$attribute.$method_argument];
             }
-            $query->$method(...$method_argument);
+            $query = $query->$method(...$method_argument);
         }
         return $query;
     }
@@ -553,39 +554,38 @@ trait DynamicFilterTrait
      * @param bool   $where
      * @return \Illuminate\Database\Query\Builder
      */
-    public function scopeModelJoin($query, $relation_name, $operator = '=', $type = 'left', $where = false)
+    public function scopeModelJoin($query, $relationships, $operator = '=', $type = 'left', $where = false)
     {
-        $relation = $this->$relation_name();
-        $table = $relation->getRelated()->getTable();
-        $qualified_parent_key_name = $relation->getQualifiedParentKeyName();
-        $foreign_key = $relation->getForeignKey();
+        if (!is_array($relationships)) {
+            $relationships = [$relationships];
+        }
 
         if (empty($query->columns)) {
-            $query->select($this->getTable().".*");
+            $query = $query->selectRaw('DISTINCT '.$this->getTable().".*");
         }
 
-        foreach (\Schema::getColumnListing($table) as $related_column) {
-            $query->addSelect(new Expression("`$table`.`$related_column` AS `$table.$related_column`"));
-        }
+        foreach ($relationships as $relation_name) {
+            $relation = $this->$relation_name();
+            $relation_class = basename(str_replace('\\', '/', get_class($relation)));
 
-        return $query->join($table, $qualified_parent_key_name, $operator, $foreign_key, $type, $where);
-    }
+            $table = $relation->getTable(); //getRelated()
+            $qualified_parent_key_name = $relation->getQualifiedParentKeyName();
+            $foreign_key = $relation->getForeignKey();
 
-    /**
-     * Limit the current query.
-     *
-     * @param \Illuminate\Database\Query\Builder $query
-     * @param  array $search_filters
-     * @return \Illuminate\Database\Query\Builder
-     */
-    public function scopeLimit($query, $search_filters)
-    {
-        if (isset($search_filters['skip']) && $search_filters['skip'] > 0) {
-            $query->skip($search_filters['skip']);
+            foreach (\Schema::getColumnListing($table) as $related_column) {
+                $query = $query->addSelect(new Expression("`$table`.`$related_column` AS `$table.$related_column`"));
+            }
+            $query = $query->join($table, $qualified_parent_key_name, $operator, $foreign_key, $type, $where);
+
+            if ($relation_class === 'BelongsToMany') {
+                $related_relation = $relation->getRelated();
+                $related_table = $related_relation->getTable();
+                $related_foreign_key = $table.'.'.$related_relation->getForeignKey();
+                $related_qualified_key_name = $related_relation->getQualifiedKeyName();
+                $query = $query->join($related_table, $related_qualified_key_name, $operator, $related_foreign_key, $type, $where);
+            }
         }
-        if (isset($search_filters['take']) && $search_filters['take'] > 0) {
-            $query->take($search_filters['take']);
-        }
+        $query->groupBy($this->getQualifiedKeyName());
         return $query;
     }
 
