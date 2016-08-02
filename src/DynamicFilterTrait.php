@@ -186,17 +186,17 @@ trait DynamicFilterTrait
     /**
      * Return a text list of the applied filters.
      *
-     * @param array $search_filters
+     * @param array $search_request
      * @return array
      */
-    public function getAppliedFiltersArray($search_filters)
+    public function getAppliedFiltersArray($search_request)
     {
         $model = (new static);
         $result = [];
         foreach ($model->getFilterAttributes() as $filter_name => $filter_settings) {
-            if (isset($search_filters[$filter_name]) && is_array($search_filters[$filter_name])) {
+            if (isset($search_request[$filter_name]) && is_array($search_request[$filter_name])) {
                 $filters = [];
-                foreach ($search_filters[$filter_name] as $value) {
+                foreach ($search_request[$filter_name] as $value) {
                     // Boolean
                     if (empty($value[1])) {
                         $filters[] = 'is <em>'.strtolower($model->getFilterOperators($filter_settings['filter'], $value[0])['name']).'</em>';
@@ -221,12 +221,12 @@ trait DynamicFilterTrait
      * Applies the filters to the model (and model's relationships).
      * 
      * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param array $search_filters
+     * @param array $search_request
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function scopeApplyAttributeFilters($query, $search_filters)
+    public function scopeApplyAttributeFilters($query, $search_request)
     {
-        if (is_array($search_filters) && !empty($search_filters)) {
+        if (isset($search_request['filters']) && is_array($search_request['filters']) && !empty($search_request['filters'])) {
 
             // Get available filters
             $filter_attributes = $this->getFilterAttributes();
@@ -234,7 +234,7 @@ trait DynamicFilterTrait
 
             // Group the filters by the the model's relationship method.
             $filters_by_model = [];
-            foreach ($search_filters as $filter_name => $filters) {
+            foreach ($search_request['filters'] as $filter_name => $filters) {
                 if (isset($filter_attributes[$filter_name]) && !empty($filter_attributes[$filter_name])) {
                     $source = explode('__', $filter_name);
                     $method_name = (count($source) == 1) ? 'self' : $source[0];
@@ -298,7 +298,7 @@ trait DynamicFilterTrait
             list($operator, $value1, $value2) = $filter_request;
 
             // User can override the field being checked
-            if ($value1[0] === '#' && isset($model->attribute_rules)) {
+            if (!empty($value1) && $value1[0] === '#' && isset($model->attribute_rules)) {
                 $available_attributes = array_keys($model->attribute_rules);
                 $available_operators = array_keys($model->getFilterOperators('string'));
                 $value1_array = explode(' ', $value1);
@@ -547,6 +547,7 @@ trait DynamicFilterTrait
     /**
      * This determines the foreign key relations automatically to prevent the need to figure out the columns.
      *
+    /**
      * @param \Illuminate\Database\Query\Builder $query
      * @param string $relation_name
      * @param string $operator
