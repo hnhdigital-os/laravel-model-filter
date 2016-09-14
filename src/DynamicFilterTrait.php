@@ -57,6 +57,8 @@ trait DynamicFilterTrait
         'NOT_IN'    => ['value' => 'NOT_IN', 'name' => 'Not in...', 'helper' => 'Separated by semi-colon'],
         'EMPTY'     => ['value' => 'EMPTY', 'name' => 'Empty'],
         'NOT_EMPTY' => ['value' => 'NOT_EMPTY', 'name' => 'Not empty'],
+        'NULL'      => ['value' => 'NULL', 'name' => 'NULL'],
+        'NOT_NULL'  => ['value' => 'NOT_NULL', 'name' => 'Not NULL'],
     ];
 
     /**
