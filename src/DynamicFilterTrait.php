@@ -500,6 +500,14 @@ trait DynamicFilterTrait
                         $arguments = [$value1];
 
                         return true;
+                    case 'NULL':
+                        $method = 'whereNull';
+
+                        return true;
+                    case 'NOT_NULL':
+                        $method = 'whereNotNull';
+
+                        return true;
                 }
                 break;
             case 'list':
