@@ -240,10 +240,18 @@ trait DynamicFilterTrait
 
                     // String or number
                     elseif (!empty($value[1])) {
-                        if (is_array($value[1])) {
-                            $value[1] = implode(',', $value[1]);
+                        if (!is_array($value[1])) {
+                            $value[1] = [$value[1]];
                         }
-                        $filters[] = '<em>'.strtolower($model->getFilterOperators($filter_settings['filter'], $value[0])['name']).'</em> <strong>'.$value[1].'</strong>';
+
+                        $filter_list = '';
+                        foreach ($value[1] as &$filter_text) {
+                            if (strlen($filter_text) > 50) {
+                                $filter_text = '<a href="javascript:void(0);" onclick="$(this).find(\'.small-list\').toggle();$(this).find(\'.large-list\').toggle();"><span class="small-list" title="Expand to view full list" style="text-decoration:underline;">'.substr($filter_text, 0, 50).'...</span> <span class="large-list" style="display:none;">'.$filter_text.'</span></a>';
+                            }
+                        }
+
+                        $filters[] = '<em>'.strtolower($model->getFilterOperators($filter_settings['filter'], $value[0])['name']).'</em> <strong>'.implode(',', $value[1]).'</strong>';
                     }
                 }
                 if (count($filters)) {
@@ -473,16 +481,12 @@ trait DynamicFilterTrait
                         return true;
                     case 'IN':
                         $method = 'whereIn';
-                        $value1 = explode(';', $value1);
-                        $value1 = array_filter(array_map('trim', $value1));
-                        $arguments = [$value1];
+                        $arguments = [static::getListFromString($value1)];
 
                         return true;
                     case 'NOT_IN':
                         $method = 'whereIn';
-                        $value1 = explode(';', $value1);
-                        $value1 = array_filter(array_map('trim', $value1));
-                        $arguments = [$value1];
+                        $arguments = [static::getListFromString($value1)];
 
                         return true;
                     case 'NULL':
@@ -518,21 +522,16 @@ trait DynamicFilterTrait
                         return true;
                     case 'IN':
                         $method = 'whereIn';
-                        $value1 = explode(';', $value1);
-                        $value1 = array_filter(array_map('trim', $value1));
-                        $arguments = [$value1];
+                        $arguments = [static::getListFromString($value1)];
 
                         return true;
                     case 'NOT_IN':
                         $method = 'whereIn';
-                        $value1 = explode(';', $value1);
-                        $value1 = array_filter(array_map('trim', $value1));
-                        $arguments = [$value1];
+                        $arguments = [static::getListFromString($value1)];
 
                         return true;
                     case 'NULL':
                         $method = 'whereNull';
-
                         return true;
                     case 'NOT_NULL':
                         $method = 'whereNotNull';
@@ -584,6 +583,21 @@ trait DynamicFilterTrait
         }
 
         return false;
+    }
+
+    /**
+     * Get array of values from an input string.
+     *
+     * @param  string $string
+     *
+     * @return array
+     */
+    private static function getListFromString($input)
+    {
+        $input = str_replace([',', ' '], ';', $input);
+        $input = explode(';', $input);
+
+        return array_filter(array_map('trim', $input));
     }
 
     /**
