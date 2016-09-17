@@ -17,6 +17,7 @@ trait DynamicFilterTrait
         'date',
         'boolean',
         'list',
+        'listLookup'
     ];
 
     /**
@@ -86,6 +87,16 @@ trait DynamicFilterTrait
      * @var array
      */
     protected $list_operators = [
+        'IN'     => ['value' => 'IN', 'name' => 'In selected'],
+        'NOT_IN' => ['value' => 'NOT_IN', 'name' => 'Not in selected'],
+    ];
+
+    /**
+     * List operators.
+     *
+     * @var array
+     */
+    protected $list_lookup_operators = [
         'IN'     => ['value' => 'IN', 'name' => 'In selected'],
         'NOT_IN' => ['value' => 'NOT_IN', 'name' => 'Not in selected'],
     ];
@@ -165,7 +176,7 @@ trait DynamicFilterTrait
                         $related_model = (new $model_class());
                         $model_filters = $related_model->getFilterAttributes(false);
                         foreach ($model_filters as $filter_name => $filter_setting) {
-                            $filter_setting['source'] = $model_class;
+                            $filter_setting['source_method'] = $model_class;
                             $filter_setting['method'] = $method;
                             $filter_setting['filter_name'] = $method.'__'.$filter_name;
                             $filters[$method.'__'.$filter_name] = $filter_setting;
@@ -210,10 +221,23 @@ trait DynamicFilterTrait
             if (isset($search_request[$filter_name]) && is_array($search_request[$filter_name])) {
                 $filters = [];
                 foreach ($search_request[$filter_name] as $value) {
+
+                    // List
+                    if ($filter_settings['filter'] === 'listLookup') {
+                        $source_method = $filter_settings['source_method'];
+                        if (method_exists($model, $source_method)) {
+                            $filter_value_options = $model->$source_method($value[1]);
+
+                            $value_option = array_column($filter_value_options, 1);
+                            $filters[] = '<em>in</em> <strong>'.implode(',', $value_option).'</strong>';
+                        }
+                    }
+
                     // Boolean
-                    if (empty($value[1])) {
+                    elseif (empty($value[1])) {
                         $filters[] = 'is <em>'.strtolower($model->getFilterOperators($filter_settings['filter'], $value[0])['name']).'</em>';
                     }
+
                     // String or number
                     elseif (!empty($value[1])) {
                         if (is_array($value[1])) {
@@ -370,13 +394,17 @@ trait DynamicFilterTrait
             $arguments = [];
             $positive = !(stripos($operator, '!') !== false || stripos($operator, 'NOT') !== false);
 
-            if (static::validateOperators($filter_setting['filter'], $method, $arguments, $operator, $value1, $value2)) {
+            if (static::validateOperators($filter_setting['filter'], $method, $arguments, $model, $filter_setting, $operator, $value1, $value2)) {
                 if (is_array($attribute)) {
                     $query = $query->where(function ($sub_query) use ($attribute, $method, $arguments, $positive) {
                         return static::applyFilterAttributeArray($sub_query, $attribute, $method, $arguments, $positive);
                     });
                 } else {
                     if (is_array($arguments)) {
+                        if (($method === 'whereIn' || $method === 'whereNotIn')
+                            && empty($arguments[0])) {
+                            break;
+                        }
                         array_unshift($arguments, $attribute);
                         $query = $query->$method(...$arguments);
                     } else {
@@ -394,13 +422,15 @@ trait DynamicFilterTrait
      *
      * @param string &$method
      * @param array  &$arguments
+     * @param Model  $model
+     * @param array  $filter_setting
      * @param array  $operator
      * @param array  $value1
      * @param array  $value2
      *
      * @return bool
      */
-    private static function validateOperators($filter, &$method, &$arguments, $operator, $value1, $value2)
+    private static function validateOperators($filter, &$method, &$arguments, $model, $filter_setting, $operator, $value1, $value2)
     {
         switch ($filter) {
             case 'string':
@@ -510,6 +540,17 @@ trait DynamicFilterTrait
                         return true;
                 }
                 break;
+            case 'listLookup':
+                if (isset($filter_setting['result_method'])) {
+                    $method_lookup = $filter_setting['result_method'];
+                    if (!empty($value1) && method_exists($model, $method_lookup)) {
+                        $value1 = $model->$method_lookup($value1);
+                    } else {
+                        $value1 = [];
+                    }
+                } else {
+                    $value1 = [];
+                }
             case 'list':
                 switch ($operator) {
                     case 'IN':
@@ -584,7 +625,7 @@ trait DynamicFilterTrait
      */
     public function getFilterOperators($type, $operator = false)
     {
-        $source = $type.'_operators';
+        $source = snake_case($type).'_operators';
         if ($operator !== false && isset($this->$source[$operator])) {
             return $this->$source[$operator];
         } elseif ($operator !== false) {
