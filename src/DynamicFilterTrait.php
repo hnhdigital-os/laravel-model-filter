@@ -675,7 +675,12 @@ trait DynamicFilterTrait
             $relation = $this->$relation_name();
             $relation_class = basename(str_replace('\\', '/', get_class($relation)));
 
-            $table = $relation->getTable(); //getRelated()
+            if ($relation_class === 'HasOne') {
+                $table = $relation->getRelated()->getTable();
+            } else {
+                $table = $relation->getTable();
+            }
+
             $qualified_parent_key_name = $relation->getQualifiedParentKeyName();
             $foreign_key = $relation->getForeignKey();
 
