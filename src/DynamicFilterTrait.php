@@ -144,14 +144,15 @@ trait DynamicFilterTrait
         if (isset($model->filter_attributes) && is_array($model->filter_attributes)) {
             $filters = $model->filter_attributes;
 
-            foreach ($filters as $key => &$filter_setting) {
-                if (isset($filter_setting['name']) && isset($filter_setting['attribute']) && isset($filter_setting['filter'])) {
+            foreach ($filters as $key => &$filter_detail) {
+                if (isset($filter_detail['name']) && isset($filter_detail['attribute']) && isset($filter_detail['filter'])) {
                     $model_name = $model->getFilterModelName();
-                    $filter_setting['name'] = $model_name.': '.$filter_setting['name'];
-                    $filter_setting['method'] = 'self';
-                    $filter_setting['filter_name'] = $key;
-                    if (is_array($filter_setting['attribute'])) {
-                        foreach ($filter_setting['attribute'] as $key => &$value) {
+                    $filter_detail['attribute_name'] = $filter_detail['name'];
+                    $filter_detail['name'] = $model_name.': '.$filter_detail['attribute_name'];
+                    $filter_detail['method'] = 'self';
+                    $filter_detail['filter_name'] = $key;
+                    if (is_array($filter_detail['attribute'])) {
+                        foreach ($filter_detail['attribute'] as $key => &$value) {
                             if ($value[0] === '{') {
                                 $value = new Expression(substr($value, 1));
                             } elseif (strpos($value, '.') === false) {
@@ -159,27 +160,35 @@ trait DynamicFilterTrait
                             }
                         }
                     } else {
-                        if ($filter_setting['attribute'][0] === '{') {
-                            $filter_setting['attribute'] = new Expression(substr($filter_setting['attribute'], 1));
-                        } elseif (strpos($filter_setting['attribute'], '.') === false) {
-                            $filter_setting['attribute'] = $model->getTable().'.'.$filter_setting['attribute'];
+                        if ($filter_detail['attribute'][0] === '{') {
+                            $filter_detail['attribute'] = new Expression(substr($filter_detail['attribute'], 1));
+                        } elseif (strpos($filter_detail['attribute'], '.') === false) {
+                            $filter_detail['attribute'] = $model->getTable().'.'.$filter_detail['attribute'];
                         }
                     }
                 } else {
                     unset($filters[$key]);
                 }
-                unset($filter_setting);
+                unset($filter_detail);
             }
             if ($first_call) {
-                foreach ($model->getFilterRelationships() as $method => $model_class) {
-                    if ($model_class !== static::class) {
+                foreach ($model->getFilterRelationships() as $method_name => $settings) {
+                    if (method_exists($model, $method_name)) {
+                        $relation = $model->$method_name();
+                        $model_class = get_class($relation->getRelated());
+
                         $related_model = (new $model_class());
                         $model_filters = $related_model->getFilterAttributes(false);
-                        foreach ($model_filters as $filter_name => $filter_setting) {
-                            $filter_setting['source_method'] = $model_class;
-                            $filter_setting['method'] = $method;
-                            $filter_setting['filter_name'] = $method.'__'.$filter_name;
-                            $filters[$method.'__'.$filter_name] = $filter_setting;
+                        foreach ($model_filters as $filter_name => $filter_detail) {
+                            if ($model_class !== static::class) {
+                                if (isset($settings['name'])) {
+                                    $filter_detail['name'] = $settings['name'].': '.$filter_detail['attribute_name'];
+                                }
+                                $filter_detail['source_method'] = $model_class;
+                                $filter_detail['method'] = $method_name;
+                                $filter_detail['filter_name'] = $method_name.'__'.$filter_name;
+                                $filters[$filter_detail['filter_name']] = $filter_detail;
+                            }
                         }
                     }
                 }
