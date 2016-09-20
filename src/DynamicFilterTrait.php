@@ -233,7 +233,7 @@ trait DynamicFilterTrait
 
                     // List
                     if ($filter_settings['filter'] === 'listLookup') {
-                        $source_method = $filter_settings['source_method'];
+                        $source_method = 'getFilter'.$filter_settings['source'].'Options';
                         if (method_exists($model, $source_method)) {
                             $filter_value_options = $model->$source_method($value[1]);
 
@@ -549,8 +549,8 @@ trait DynamicFilterTrait
                 }
                 break;
             case 'listLookup':
-                if (isset($filter_setting['result_method'])) {
-                    $method_lookup = $filter_setting['result_method'];
+                if (isset($filter_setting['source'])) {
+                    $method_lookup = 'getFilter'.$filter_setting['source'].'Result';
                     if (!empty($value1) && method_exists($model, $method_lookup)) {
                         $value1 = $model->$method_lookup($value1);
                     } else {
