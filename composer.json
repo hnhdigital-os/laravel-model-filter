@@ -1,5 +1,5 @@
 {
-    "name": "bluora/laravel-model-dynamic-filter",
+    "name": "bluora/laravel-dynamic-filter",
     "description": "Provides dynamic attribute filtering for Laravel's Eloquent Model.",
     "keywords": ["laravel","illuminate","eloquent", "dynamic", "filtering"],
     "license": "MIT",
@@ -10,7 +10,8 @@
         }
     ],
     "require": {
-        "php": ">=5.4.0"
+        "php": ">=5.4.0",
+        "bluora/laravel-html-generator": "dev-master"
     },
     "require-dev": {
         "phpunit/phpunit": "4.*",
@@ -20,7 +21,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Bluora\\LaravelModelDynamicFilter\\": "src/"
+            "Bluora\\LaravelDynamicFilter\\": "src/"
         }
     }
 }

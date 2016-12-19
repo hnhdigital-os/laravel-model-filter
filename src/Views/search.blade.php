@@ -181,7 +181,7 @@
               @if(!empty($filter_settings) && is_array($applied_filters))
               @foreach($applied_filters as $filter)
               @if(empty($filter_settings['search_tab_only']))
-              @include('common.module.content.search.filter', ['placeholder_id' => $filter_name.'_'.$placeholder_count, 'type' => $filter_settings['filter'], 'template' => false, 'filter_settings' => $filter_settings, 'operator_options' => $operator_options[$filter_settings['filter']]])
+              @include('dynamic_filter::filter', ['placeholder_id' => $filter_name.'_'.$placeholder_count, 'type' => $filter_settings['filter'], 'template' => false, 'filter_settings' => $filter_settings, 'operator_options' => $operator_options[$filter_settings['filter']]])
               @endif
               @endforeach
               @endif
@@ -201,7 +201,7 @@
               </label>
             </div>
             @foreach($filter_types as $type)
-            @include('common.module.content.search.filter', ['type' => $type, 'template' => true, 'filter_name' => '', 'filter_settings' => [], 'filter' => [], 'operator_options' => $operator_options[$type]])
+            @include('dynamic_filter::filter', ['type' => $type, 'template' => true, 'filter_name' => '', 'filter_settings' => [], 'filter' => [], 'operator_options' => $operator_options[$type]])
             @endforeach
           </div>
         </div>

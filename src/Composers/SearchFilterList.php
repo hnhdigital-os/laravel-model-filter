@@ -1,11 +1,11 @@
 <?php
 
-namespace Bluora\LaravelModelDynamicFilter\Composers;
+namespace Bluora\LaravelDynamicFilter\Composers;
 
 use Bluora\LaravelHtmlGenerator\Html;
 use Illuminate\Contracts\View\View;
 
-class SearchFilterListComposer
+class SearchFilterList
 {
     /**
      * Create a new common module search composer.

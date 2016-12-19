@@ -1,6 +1,6 @@
 <?php
 
-namespace Bluora\LaravelModelDynamicFilter;
+namespace Bluora\LaravelDynamicFilter\Objects;
 
 class SearchViewResult extends SettingsAbstract
 {
