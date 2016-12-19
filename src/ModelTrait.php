@@ -1,10 +1,10 @@
 <?php
 
-namespace Bluora\LaravelModelDynamicFilter;
+namespace Bluora\LaravelModelDynamicFilter\Traits;
 
 use Illuminate\Database\Query\Expression;
 
-trait DynamicFilterTrait
+trait ModelTrait
 {
     /**
      * Filter types.
