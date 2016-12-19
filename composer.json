@@ -1,5 +1,5 @@
 {
-    "name": "bluora/laravel-model-dynamic-filter",
+    "name": "bluora/laravel-dynamic-filter",
     "description": "Provides dynamic attribute filtering for Laravel's Eloquent Model.",
     "keywords": ["laravel","illuminate","eloquent", "dynamic", "filtering"],
     "license": "MIT",
