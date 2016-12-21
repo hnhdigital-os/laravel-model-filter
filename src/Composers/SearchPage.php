@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\ViewComposers;
+namespace Bluora\LaravelDynamicFilter\Composers;
 
 use App\Models\AppModel;
 use App\Models\ModelFilter;
