@@ -120,7 +120,7 @@ class SearchPage
                 $layout_div_class = 'wrapper wrapper-content animated fadeInRight';
             }
         } else {
-            $view_data['search_data'] = ['setup' => new \App\Settings\SearchViewOptions(), 'result' => new \App\Settings\SearchViewResult()];
+            $view_data['search_data'] = ['setup' => new \Bluora\LaravelDynamicFilter\Objects\SearchViewOptions(), 'result' => new \Bluora\LaravelDynamicFilter\Objects\SearchViewResult()];
             $setup = $view_data['search_data']['setup'];
         }
 
