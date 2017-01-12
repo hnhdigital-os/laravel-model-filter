@@ -6,6 +6,7 @@ use Bluora\LaravelDynamicFilter\Objects\SearchViewOptions;
 use Bluora\LaravelDynamicFilter\Objects\SearchViewResult;
 use Bluora\LaravelDynamicFilterl;
 use Html;
+use Illuminate\Http\Request as HttpRequest;
 use Illuminate\Pagination\Paginator;
 use Request;
 use Route;
