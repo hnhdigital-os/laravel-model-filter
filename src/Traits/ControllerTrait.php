@@ -2,6 +2,14 @@
 
 namespace Bluora\LaravelDynamicFilter\Traits;
 
+use Bluora\LaravelDynamicFilter\Objects\SearchViewOptions;
+use Bluora\LaravelDynamicFilter\Objects\SearchViewResult;
+use Bluora\LaravelDynamicFilterl;
+use Html;
+use Illuminate\Pagination\Paginator;
+use Request;
+use Route;
+
 trait ControllerTrait
 {
     /**

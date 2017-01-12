@@ -14,7 +14,7 @@ class ServiceProvider extends BaseServiceProvider
      */
     public function boot()
     {
-        $this->loadViewsFrom(__DIR__.'/views', 'dynamic_filter');
+        $this->loadViewsFrom(__DIR__.'/Views/', 'dynamic_filter');
 
         view()->composer('dynamic_filter::search', 'Bluora\LaravelDynamicFilter\Composers\SearchPage');
         view()->composer('dynamic_filter::filter_list', 'Bluora\LaravelDynamicFilter\Composers\SearchFilterList');
