@@ -2,6 +2,7 @@
 
 namespace Bluora\LaravelDynamicFilter\Traits;
 
+use DB;
 use Illuminate\Database\Query\Expression;
 
 trait ModelTrait
@@ -414,7 +415,7 @@ trait ModelTrait
             if (static::validateOperators($filter_setting['filter'], $method, $arguments, $model, $filter_setting, $operator, $value1, $value2)) {
                 if (is_array($attribute)) {
                     $query = $query->where(function ($sub_query) use ($attribute, $method, $arguments, $positive) {
-                        return static::applyFilterAttributeArray($sub_query, $attribute, $method, $arguments, $positive);
+                        return static::applyFilterAttributeArray($sub_query, DB::raw($attribute), $method, $arguments, $positive);
                     });
                 } else {
                     if (is_array($arguments)) {
@@ -422,7 +423,7 @@ trait ModelTrait
                             && empty($arguments[0])) {
                             break;
                         }
-                        array_unshift($arguments, $attribute);
+                        array_unshift($arguments, DB::raw($attribute));
                         $query = $query->$method(...$arguments);
                     } else {
                         $query = $query->$method($attribute.$arguments);
@@ -577,13 +578,13 @@ trait ModelTrait
                 switch ($operator) {
                     case 1:
                     case '1':
-                        $arguments = ['=', '1'];
+                        $arguments = ['=', true];
 
                         return true;
                         break;
                     case 0:
                     case '0':
-                        $arguments = ['=', '0'];
+                        $arguments = ['=', false];
 
                         return true;
                         break;
