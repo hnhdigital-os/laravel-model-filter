@@ -109,7 +109,7 @@
       <div id="{!! $setup->get('search.name') !!}-tab-1" class="tab-pane active">
         <div class="full-height-scroll">
           <div class="table-responsive">
-            <table class="table table-striped table-hover">
+            <table class="table table-striped table-hover" style="width:99%;">
               <colgroup>
                 @for($c = 0; $c < $setup->get('colgroup.total', 1); $c++)
                 <col {!! $setup->get('colgroup.'.$c.'.col', '') !!} {!! $setup->has('colgroup.'.$c.'.width') ? 'width="'.$setup->get('colgroup.'.$c.'.width').'"' : '' !!}>
