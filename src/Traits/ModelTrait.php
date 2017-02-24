@@ -453,6 +453,18 @@ trait ModelTrait
      */
     private static function validateOperators($filter, &$method, &$arguments, $model, $filter_setting, $operator, $value1, $value2)
     {
+        // No space search.
+        if (array_has($filter_setting, 'phone_search')) {
+            $value1_numeric = str_replace(' ', '', $value1);
+            if (is_numeric($value1_numeric)) {
+                $new_value1 = '';
+                for ($pos=0; $pos < strlen($value1); $pos++) { 
+                    $new_value1 .= substr($value1_numeric, $pos, 1).'%';
+                }
+                $value1 = $new_value1;
+            }
+        }
+
         switch ($filter) {
             case 'string':
                 switch ($operator) {
