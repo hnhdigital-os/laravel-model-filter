@@ -414,8 +414,11 @@ trait ModelTrait
 
             if (static::validateOperators($filter_setting['filter'], $method, $arguments, $model, $filter_setting, $operator, $value1, $value2)) {
                 if (is_array($attribute)) {
+                    foreach ($attribute as &$value) {
+                        $value = DB::raw($value);
+                    }
                     $query = $query->where(function ($sub_query) use ($attribute, $method, $arguments, $positive) {
-                        return static::applyFilterAttributeArray($sub_query, DB::raw($attribute), $method, $arguments, $positive);
+                        return static::applyFilterAttributeArray($sub_query, $attribute, $method, $arguments, $positive);
                     });
                 } else {
                     if (is_array($arguments)) {
