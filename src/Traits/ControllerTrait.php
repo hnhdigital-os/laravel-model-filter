@@ -100,10 +100,14 @@ trait ControllerTrait
                 $relation = $model->$method_name();
                 $relation_class = basename(str_replace('\\', '/', get_class($relation)));
 
-                if ($relation_class == 'BelongsTo') {
-                    $model_key_name = $relation->getForeignKey();
-                } else {
-                    $model_key_name = $method_source.'_id';
+                switch ($relation_class) {
+                    case 'BelongsTo':
+                    case 'HasOne':
+                        $model_key_name = $relation->getForeignKey();
+                        break;
+                    case 'BelongsToMany':
+                        $model_key_name = $relation->getOtherKey();
+                        break;
                 }
 
                 $query = $model->whereHas($method_name, function ($sub_query) use ($model_key_name, $model_id) {
@@ -131,10 +135,14 @@ trait ControllerTrait
                 $relation = $model->$method_name();
                 $relation_class = basename(str_replace('\\', '/', get_class($relation)));
 
-                if ($relation_class == 'BelongsTo') {
-                    $model_key_name = $relation->getForeignKey();
-                } else {
-                    $model_key_name = $method_source.'_id';
+                switch ($relation_class) {
+                    case 'BelongsTo':
+                    case 'HasOne':
+                        $model_key_name = $relation->getForeignKey();
+                        break;
+                    case 'BelongsToMany':
+                        $model_key_name = $relation->getOtherKey();
+                        break;
                 }
 
                 $list = $model->whereHas($method_name, function ($sub_query) use ($model_key_name, $model_id) {
@@ -252,32 +260,18 @@ trait ControllerTrait
      */
     protected static function showSearchAppliedFilters(&$tbody, &$search_request, $result, $model, $column_span = 1)
     {
-        $search_request['paginate_count'] = $result->count();
-        if (method_exists($result, 'currentPage')) {
-            $search_request['paginate_current_page'] = $result->currentPage();
-            $search_request['paginate_has_more_pages'] = $result->hasMorePages();
-            $search_request['paginate_last_page'] = $result->lastPage();
-            $search_request['paginate_per_page'] = $result->perPage();
-            $search_request['paginate_total'] = $result->total();
-        } else {
-            $search_request['page'] = 0;
-            $search_request['paginate_current_page'] = 1;
-            $search_request['paginate_has_more_pages'] = false;
-            $search_request['paginate_last_page'] = 1;
-            $search_request['paginate_per_page'] = 1;
-            $search_request['paginate_total'] = $result->count();
-        }
+        self::pagination($result, $search_request);
 
         // Applied filters
         if (count($search_request)) {
             $filters = (new $model())->getAppliedFiltersArray($search_request['filters']);
 
-            if (property_exists($model, 'mode_active')) {
-                if (array_has($search_request, 'mode') && array_get($search_request, 'mode') > $model::$mode_active) {
-                    $mode_name = (array_get($search_request, 'mode') == $model::$mode_archived) ? 'archived' : 'removed';
-                    $filters[] = '<strong>'.$model::getFilterModelName().'</strong> <em>is</em> <strong>'.$mode_name.'</strong>';
-                }
-            }
+            //if (property_exists($model, 'mode_active')) {
+            //    if (array_has($search_request, 'mode') && array_get($search_request, 'mode') > $model::$mode_active) {
+            //        $mode_name = (array_get($search_request, 'mode') == $model::$mode_archived) ? 'archived' : 'removed';
+            //        $filters[] = '<strong>'.$model::getFilterModelName().'</strong> <em>is</em> <strong>'.$mode_name.'</strong>';
+            //    }
+            //}
             if (count($filters) || isset($search_request['saved_filter']) || isset($search_request['page'])) {
                 $row_html = '';
                 if (count($filters)) {
@@ -314,6 +308,30 @@ trait ControllerTrait
     }
 
     /**
+     * Get the pagination values.
+     *
+     * @return void
+     */
+    private static function pagination(&$result, &$search_request)
+    {
+        $search_request['paginate_count'] = $result->count();
+        if (method_exists($result, 'currentPage')) {
+            $search_request['paginate_current_page'] = $result->currentPage();
+            $search_request['paginate_has_more_pages'] = $result->hasMorePages();
+            $search_request['paginate_last_page'] = $result->lastPage();
+            $search_request['paginate_per_page'] = $result->perPage();
+            $search_request['paginate_total'] = $result->total();
+        } else {
+            $search_request['page'] = 0;
+            $search_request['paginate_current_page'] = 1;
+            $search_request['paginate_has_more_pages'] = false;
+            $search_request['paginate_last_page'] = 1;
+            $search_request['paginate_per_page'] = 1;
+            $search_request['paginate_total'] = $result->count();
+        }
+    }
+
+    /**
      * Show no results available.
      *
      * @param \Tag   &$tbody
@@ -325,8 +343,10 @@ trait ControllerTrait
      *
      * @return void
      */
-    protected static function checkSearchResults($table, $result, $search_request, $name, $column_span = 1, $config = [])
+    protected static function checkSearchResults($table, $result, &$search_request, $name, $column_span = 1, $config = [])
     {
+        self::pagination($result, $search_request);
+
         $thead = false;
         if (is_array($tbody = $table)) {
             list($thead, $tbody) = $table;
