@@ -1,5 +1,5 @@
 @if(config('dynamic_filter.no_search_js', true))
-<script src="{{ config('dynamic_filter.search_js_url', '/assets/vendor/bluora/laravel-dynamic-filter/search.js') }}" defer></script>
+<script src="{{ config('dynamic_filter.search_js_url', Resource::elixir('vendor/bluora/laravel-dynamic-filter/search.js')) }}" defer></script>
 @endif
 
     @capturestart
