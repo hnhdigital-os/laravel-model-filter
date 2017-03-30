@@ -457,8 +457,11 @@ trait ModelTrait
         if (array_has($filter_setting, 'phone_search')) {
             $value1_numeric = str_replace(' ', '', $value1);
             if (is_numeric($value1_numeric)) {
+                if (substr($value1_numeric, 0, 1) === '0') {
+                    $value1_numeric = substr($value1_numeric, 1);
+                }
                 $new_value1 = '';
-                for ($pos=0; $pos < strlen($value1); $pos++) { 
+                for ($pos=0; $pos < strlen($value1_numeric); $pos++) { 
                     $new_value1 .= substr($value1_numeric, $pos, 1).'%';
                 }
                 $value1 = $new_value1;
