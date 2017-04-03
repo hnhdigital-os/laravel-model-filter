@@ -29,6 +29,11 @@ trait ControllerTrait
 
         $options['route_paramater'] = (empty($options['route_paramater'])) ? $current_model : $options['route_paramater'];
 
+        // Remove plural to get route paramater
+        if (substr($options['route_paramater'], -1, 1) == 's') {
+            $options['route_paramater'] = substr($options['route_paramater'], 0, -1);
+        }
+
         // Current model
         if (!isset($options['model'])) {
             $options['model'] = Route::current()->getParameter($options['route_paramater']);
