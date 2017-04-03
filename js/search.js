@@ -5,7 +5,7 @@ $(document).ready(function() {
     var track_filters = 0;
     $('.common-module-content-search .action-add-filter').on('select2:select', function(e) {
         var search_table_id = $(this).parents('.common-module-content-search').attr('id');
-        select_settings = $(this).children('option:selected').val().split('|');
+        var select_settings = $(this).children('option:selected').val().split('|');
         while ($('#' + select_settings[0] + '_' + track_filters).length > 0) {
             track_filters++;
         }
@@ -13,7 +13,7 @@ $(document).ready(function() {
         var filter_name = select_settings[0];
         track_filters++;
 
-        filter_template = $('#'+search_table_id+' .filter-'+select_settings[1]+'-template').html();
+        var filter_template = $('#'+search_table_id+' .filter-'+select_settings[1]+'-template').html();
         filter_template = filter_template.replace(/{PLACEHOLDER_ATTRIBUTE_NAME}/g, $(this).children('option:selected').text());
         filter_template = filter_template.replace(/{PLACEHOLDER_SEARCH_NAME}/g, filter_name);
         filter_template = filter_template.replace(/{PLACEHOLDER_ID}/g, filter_id);
@@ -62,8 +62,8 @@ $(document).ready(function() {
     /* User clicks the mode drop down */
     $('.common-module-content-search').on('click', '.search-filter-mode ul.dropdown-menu li a', function(e) {
         var search_table_id = $(this).parents('.common-module-content-search').attr('id');
-        mode_name = $(this).html()+'<span class="caret"></span>';
-        mode_value = $(this).data('mode');
+        var mode_name = $(this).html()+'<span class="caret"></span>';
+        var mode_value = $(this).data('mode');
         $(this).parents('.search-filter-mode').children('a.dropdown-toggle').html(mode_name);
         $(this).parents('.search-filter-mode').children('input.search-field').val(mode_value);
         $('.dropdown-menu li').show();
@@ -116,19 +116,19 @@ $(document).ready(function() {
 
     /* User clicks the apply button */
     $('.common-module-content-search').on('click', '.action-apply-filter', function(e) {
-      search_table_id = $(this).parents('.common-module-content-search').attr('id');
+      var search_table_id = $(this).parents('.common-module-content-search').attr('id');
       $('#'+search_table_id+'-form button[type=submit]').trigger('click');
     });
 
-    /* User clicks the apply button */
+    /* User clicks the change button */
     $('.common-module-content-search').on('click', '.action-change-filter', function(e) {
-      search_table_id = $(this).parents('.common-module-content-search').attr('id');
+      var search_table_id = $(this).parents('.common-module-content-search').attr('id');
       $('#'+search_table_id+'-tab2').tab('show');
     });
 
     /* User clicks the cancel button */
     $('.common-module-content-search').on('click', '.action-cancel-filter', function(e) {
-      search_table_id = $(this).parents('.common-module-content-search').attr('id');
+      var search_table_id = $(this).parents('.common-module-content-search').attr('id');
       $('#'+search_table_id+' .applied-filters .action-remove-row').trigger('click');
       $('#'+search_table_id+' .search-filter-field').val('');
       $('#'+search_table_id+'-form button[type=submit]').trigger('click');
@@ -136,7 +136,7 @@ $(document).ready(function() {
 
     /* User clicks the save button */
     $('.common-module-content-search').on('click', 'a.action-save-filter', function(e) {
-      search_table_id = $(this).parents('.common-module-content-search').attr('id');
+      var search_table_id = $(this).parents('.common-module-content-search').attr('id');
       $('#action-save-filter').data('search-table-id', search_table_id);
     });
 
@@ -144,20 +144,20 @@ $(document).ready(function() {
     $('#action-save-filter').on('click', '.action-save-filter,.action-save-filter1', function(e) {
       toastr.remove();
       $('#action-save-filter').find('input[name=filter_name]').parents('.form-group').removeClass('has-error');
-      search_table_id = $('#action-save-filter').data('search-table-id');
+      var search_table_id = $('#action-save-filter').data('search-table-id');
 
-      filter_data = {};
+      var filter_data = {};
       filter_data['name'] = $('#action-save-filter').find('input[name=filter_name]').val();
       filter_data['description'] = $('#action-save-filter').find('textarea[name=filter_description]').val();
       filter_data['search'] = common_module_content_search.getFilters(search_table_id);
       filter_data['is_public'] = $('#action-save-filter').find('input[name=filter_is_public]').val();
 
       if ($(this).hasClass('action-save-filter1') && $(this).data('saved-filter-uuid') != '') {
-        update_cmd = $(this).data('saved-filter-uuid') + '/saveFilter';
-        method = 'PATCH';
+        var update_cmd = $(this).data('saved-filter-uuid') + '/saveFilter';
+        var method = 'PATCH';
       } else {
-        update_cmd = 'saveNewFilter';
-        method = 'POST';
+        var update_cmd = 'saveNewFilter';
+        var method = 'POST';
       }
 
       if (filter_data.name.length > 2) {
@@ -210,10 +210,10 @@ $(document).ready(function() {
 
     /* User clicks an option in the available saved filters  */
     $('.common-module-content-search .action-load-filter').on('select2:select', function(e) {
-      search_table_id = $(this).parents('.common-module-content-search').attr('id');
-      selected_uuid = $(this).children('option:selected').val();
+      var search_table_id = $(this).parents('.common-module-content-search').attr('id');
+      var selected_uuid = $(this).children('option:selected').val();
 
-      search_data = {
+      var search_data = {
         'model': $(this).parents('.common-module-content-search').data('search-model'),
         'controller': $(this).parents('.common-module-content-search').data('search-controller'),
         'method': $(this).parents('.common-module-content-search').data('search-method'),
@@ -279,17 +279,17 @@ $(document).ready(function() {
     });
 
     $('.common-module-content-search a.tab-search-results[data-toggle="tab"]').on('shown.bs.tab', function (e) {
-      search_table_id = $(this).parents('.common-module-content-search').attr('id');
+      var search_table_id = $(this).parents('.common-module-content-search').attr('id');
       $('#' + search_table_id + ' .search-buttons,#' + search_table_id + ' .search-items-per-page-pulldown').show();
     });
 
     $('.common-module-content-search a.tab-search-results[data-toggle="tab"]').on('hidden.bs.tab', function (e) {
-      search_table_id = $(this).parents('.common-module-content-search').attr('id');
+      var search_table_id = $(this).parents('.common-module-content-search').attr('id');
       $('#' + search_table_id + ' .search-buttons,#' + search_table_id + ' .search-items-per-page-pulldown').hide();
     });
 
     $('.common-module-content-search').each(function(e) {
-      search_table_id = $(this).attr('id');
+      var search_table_id = $(this).attr('id');
       $('#'+search_table_id).find('li:first-child a[data-toggle=tab]').tab('show');
       $('#'+search_table_id+' .search-buttons, #'+search_table_id+' .search-items-per-page-pulldown').hide();
       if ($('#'+search_table_id+' .search-buttons a').hasClass('btn-primary')) {
