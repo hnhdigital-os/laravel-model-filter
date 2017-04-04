@@ -4,7 +4,7 @@ $(document).ready(function() {
     /* User clicks the availablle filters */
     var track_filters = 0;
     $('.common-module-content-search .action-add-filter').on('select2:select', function(e) {
-        var search_table_id = $(this).parents('.common-module-content-search').attr('id');
+        var search_table = $(this).parents('.common-module-content-search');
         var select_settings = $(this).children('option:selected').val().split('|');
         while ($('#' + select_settings[0] + '_' + track_filters).length > 0) {
             track_filters++;
@@ -13,11 +13,11 @@ $(document).ready(function() {
         var filter_name = select_settings[0];
         track_filters++;
 
-        var filter_template = $('#'+search_table_id+' .filter-'+select_settings[1]+'-template').html();
+        var filter_template = search_table.find('.filter-'+select_settings[1]+'-template').html();
         filter_template = filter_template.replace(/{PLACEHOLDER_ATTRIBUTE_NAME}/g, $(this).children('option:selected').text());
         filter_template = filter_template.replace(/{PLACEHOLDER_SEARCH_NAME}/g, filter_name);
         filter_template = filter_template.replace(/{PLACEHOLDER_ID}/g, filter_id);
-        $('#'+search_table_id+' .applied-filters').append(filter_template);
+        search_table.find('.applied-filters').append(filter_template);
         $('.applied-filters .select2-on-add').each(function() {
           $(this).removeClass('select2-on-add').addClass('select2');
           $(this).find('option:not(.filter-' + filter_name + ')').remove();
@@ -51,24 +51,24 @@ $(document).ready(function() {
 
     /* User clicks the remove button against a single applied filter */
     $('.common-module-content-search').on('keypress', '.form-control:not(.enable-on-enter)', function(e) {
-      var search_table_id = $(this).parents('.common-module-content-search').attr('id');
+      var search_table = $(this).parents('.common-module-content-search');
       var keycode = (event.keyCode ? event.keyCode : event.which);
       if (keycode === 13) {
         e.preventDefault();
-        $('#'+search_table_id+'-form button[type=submit]').trigger('click');
+        search_table.find('button[type=submit]').trigger('click');
       }
     });
 
     /* User clicks the mode drop down */
     $('.common-module-content-search').on('click', '.search-filter-mode ul.dropdown-menu li a', function(e) {
-        var search_table_id = $(this).parents('.common-module-content-search').attr('id');
+        var search_table = $(this).parents('.common-module-content-search');
         var mode_name = $(this).html()+'<span class="caret"></span>';
         var mode_value = $(this).data('mode');
         $(this).parents('.search-filter-mode').children('a.dropdown-toggle').html(mode_name);
         $(this).parents('.search-filter-mode').children('input.search-field').val(mode_value);
-        $('.dropdown-menu li').show();
-        $('.dropdown-menu li a[data-mode='+mode_value+']').parent('li').hide();
-        $('#'+search_table_id+'-form button[type=submit]').trigger('click');
+        search_table.find(('.dropdown-menu li').show();
+        search_table.find(('.dropdown-menu li a[data-mode='+mode_value+']').parent('li').hide();
+        search_table.find('button[type=submit]').trigger('click');
     });
 
     /* Hide the drop down option that is current */
@@ -85,9 +85,9 @@ $(document).ready(function() {
         $('#'+search_table_id+' .search-result-rows tr:first-child').data('processing', true);
 
         if ($('#'+search_table_id+' input.search-field[name=change_page]').val() > 0) {
-          page = $('#'+search_table_id+' input.search-field[name=change_page]').val();
+          var page = $('#'+search_table_id+' input.search-field[name=change_page]').val();
         } else {
-          page = 1;
+          var page = 1;
         }
         $.ajax($('#'+search_table_id).data('search-request') + '?page=' + page, {
           data: common_module_content_search.getFilters(search_table_id),
@@ -110,8 +110,8 @@ $(document).ready(function() {
 
     /* User submits the search form */
     $('.common-module-content-search-form').each(function(count, el) {
-      var search_table_id = $(el).attr('id');
-      $('#'+search_table_id+' button[type=submit]').on('click', submit_search_form);
+      var search_table = $(el);
+      search_table.find('button[type=submit]').on('click', submit_search_form);
     });
 
     /* User clicks the apply button */
