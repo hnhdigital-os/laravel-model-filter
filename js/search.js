@@ -279,21 +279,25 @@ $(document).ready(function() {
     });
 
     $('.common-module-content-search a.tab-search-results[data-toggle="tab"]').on('shown.bs.tab', function (e) {
-      var search_table_id = $(this).parents('.common-module-content-search').attr('id');
-      $('#' + search_table_id + ' .search-buttons,#' + search_table_id + ' .search-items-per-page-pulldown').show();
+      var search_table = $(this).parents('.common-module-content-search');
+      if (search_table.find('.search-items-per-page-pulldown').data('has-search')) {
+        search_table.find('.search-buttons,.search-items-per-page-pulldown').show();
+      }
     });
 
     $('.common-module-content-search a.tab-search-results[data-toggle="tab"]').on('hidden.bs.tab', function (e) {
       var search_table_id = $(this).parents('.common-module-content-search').attr('id');
-      $('#' + search_table_id + ' .search-buttons,#' + search_table_id + ' .search-items-per-page-pulldown').hide();
+      if (!$('#'+search_table_id+' .search-items-per-page-pulldown').data('has-search')) {
+        search_table.find('.search-buttons,.search-items-per-page-pulldown').hide();
+      }
     });
 
     $('.common-module-content-search').each(function(e) {
-      var search_table_id = $(this).attr('id');
-      $('#'+search_table_id).find('li:first-child a[data-toggle=tab]').tab('show');
-      $('#'+search_table_id+' .search-buttons, #'+search_table_id+' .search-items-per-page-pulldown').hide();
-      if ($('#'+search_table_id+' .search-buttons a').hasClass('btn-primary')) {
-        $('#'+search_table_id+' .search-buttons, #'+search_table_id+' .search-items-per-page-pulldown').show();
+      var search_table = $(this);
+      search_table.find('#'+search_table_id).find('li:first-child a[data-toggle=tab]').tab('show');
+      search_table.find('.search-buttons,.search-items-per-page-pulldown').hide();
+      if (search_table.find('.search-buttons a').hasClass('btn-primary')) {
+        search_table.find('.search-buttons,.search-items-per-page-pulldown').show();
       }
     });
     
@@ -370,10 +374,12 @@ var common_module_content_search = {
         }
 
         if (has_search == false) {
-          $('#'+search_table_id+' .search-buttons,.search-items-per-page-pulldown').hide();
+          $('#'+search_table_id+' .search-buttons,#'+search_table_id+' .search-items-per-page-pulldown').hide();
         } else {
-          $('#'+search_table_id+' .search-buttons,.search-items-per-page-pulldown').show();
+          $('#'+search_table_id+' .search-buttons,#'+search_table_id+' .search-items-per-page-pulldown').show();
         }
+
+        $('#'+search_table_id+' .search-items-per-page-pulldown').data('has-search', has_search);
 
         if (typeof $.ladda != 'undefined') {
             $.ladda('stopAll');
