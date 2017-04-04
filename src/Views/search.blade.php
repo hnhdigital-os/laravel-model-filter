@@ -107,40 +107,38 @@
     @endif
     <div class="tab-content">
       <div id="{!! $setup->get('search.name') !!}-tab-1" class="tab-pane active">
-        <div class="full-height-scroll">
-          <div class="table-responsive">
-            <table class="table table-striped table-hover" style="width:99%;">
-              <colgroup>
+        <div class="table-responsive">
+          <table class="table table-striped table-hover">
+            <colgroup>
+              @for($c = 0; $c < $setup->get('colgroup.total', 1); $c++)
+              <col {!! $setup->get('colgroup.'.$c.'.col', '') !!} {!! $setup->has('colgroup.'.$c.'.width') ? 'width="'.$setup->get('colgroup.'.$c.'.width').'"' : '' !!}>
+              @endfor
+            </colgroup>
+            <thead class="search-header">
+              {!! $result->get('rows.thead', '') !!}
+            </thead>
+            @if($setup->get('search.show', false))
+            <tbody class="search">
+              <tr>
                 @for($c = 0; $c < $setup->get('colgroup.total', 1); $c++)
-                <col {!! $setup->get('colgroup.'.$c.'.col', '') !!} {!! $setup->has('colgroup.'.$c.'.width') ? 'width="'.$setup->get('colgroup.'.$c.'.width').'"' : '' !!}>
+                  @if(!$setup->get('search.'.$c.'.hide', false))
+                  <td {!! $setup->get('search.'.$c.'.td', '') !!}>{!! $setup->has('search.'.$c.'.text') ? $setup->get('search.'.$c.'.text') : '&nbsp;' !!}</td>
+                @endif
                 @endfor
-              </colgroup>
-              <thead class="search-header">
-                {!! $result->get('rows.thead', '') !!}
-              </thead>
-              @if($setup->get('search.show', false))
-              <tbody class="search">
-                <tr>
-                  @for($c = 0; $c < $setup->get('colgroup.total', 1); $c++)
-                    @if(!$setup->get('search.'.$c.'.hide', false))
-                    <td {!! $setup->get('search.'.$c.'.td', '') !!}>{!! $setup->has('search.'.$c.'.text') ? $setup->get('search.'.$c.'.text') : '&nbsp;' !!}</td>
-                  @endif
-                  @endfor
-                </tr>
-              </tbody>
-              @endif
-              <tbody class="search-result-rows">
-                {!! $result->get('rows.tbody', '') !!}
-              </tbody>
-            </table>
-            @if(!$setup->get('tab.hide', false) && !$setup->get('tab.search_pagination.hide', false))
-            <div style="min-height:40px;">
-              <ul class="nav nav-tabs" style="display: table;margin: 0 auto;">
-                @raw(echo $result_navigation)
-              </ul>
-            </div>
+              </tr>
+            </tbody>
             @endif
+            <tbody class="search-result-rows">
+              {!! $result->get('rows.tbody', '') !!}
+            </tbody>
+          </table>
+          @if(!$setup->get('tab.hide', false) && !$setup->get('tab.search_pagination.hide', false))
+          <div style="min-height:40px;">
+            <ul class="nav nav-tabs" style="display: table;margin: 0 auto;">
+              @raw(echo $result_navigation)
+            </ul>
           </div>
+          @endif
         </div>
       </div>
       @if($setup->get('tab.advanced.show', false) && $setup->get('search.model', false) && !empty($filter_options))
