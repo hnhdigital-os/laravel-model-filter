@@ -36,7 +36,7 @@ trait ControllerTrait
 
         // Current model
         if (!isset($options['model'])) {
-            $options['model'] = Route::current()->getParameter($options['route_paramater']);
+            $options['model'] = Route::current()->parameter($options['route_paramater']);
         }
         $options['model_id'] = (isset($options['model'])) ? $options['model']->id : '';
 
@@ -101,8 +101,13 @@ trait ControllerTrait
             } else {
                 $method_name = camel_case($method_source);
 
+                if (isset($attached_method_source)) {
+                    return $model->$attached_method_source();
+                }
+
                 $model = new $class_name();
                 $relation = $model->$method_name();
+
                 $relation_class = basename(str_replace('\\', '/', get_class($relation)));
 
                 switch ($relation_class) {
@@ -111,7 +116,7 @@ trait ControllerTrait
                         $model_key_name = $relation->getForeignKey();
                         break;
                     case 'BelongsToMany':
-                        $model_key_name = $relation->getOtherKey();
+                        $model_key_name = $relation->getQualifiedRelatedKeyName();
                         break;
                 }
 
@@ -119,8 +124,8 @@ trait ControllerTrait
                     $sub_query->where($model_key_name, $model_id);
                 });
 
-                if (method_exists($query, 'active')) {
-                    $query = $query->active();
+                if (method_exists($query, 'onlyActive')) {
+                    $query = $query->onlyActive();
                 }
 
                 if (isset($attached_model_filter) && $attached_model_filter instanceof \Closure) {
@@ -136,6 +141,11 @@ trait ControllerTrait
                 return $unattached_allocations;
             } else {
                 $method_name = camel_case($method_source);
+
+                if (isset($unattached_method_source)) {
+                    return $model->$unattached_method_source();
+                }
+
                 $model = new $class_name();
                 $relation = $model->$method_name();
                 $relation_class = basename(str_replace('\\', '/', get_class($relation)));
@@ -146,7 +156,7 @@ trait ControllerTrait
                         $model_key_name = $relation->getForeignKey();
                         break;
                     case 'BelongsToMany':
-                        $model_key_name = $relation->getOtherKey();
+                        $model_key_name = $relation->getQualifiedRelatedKeyName();
                         break;
                 }
 
@@ -158,8 +168,8 @@ trait ControllerTrait
 
                 $query = $class_name::whereNotIn($model->getTable().'.id', $list);
 
-                if (method_exists($query, 'active')) {
-                    $query = $query->active();
+                if (method_exists($query, 'onlyActive')) {
+                    $query = $query->onlyActive();
                 }
 
                 if (isset($unattached_model_filter) && $unattached_model_filter instanceof \Closure) {
@@ -283,7 +293,7 @@ trait ControllerTrait
                     $row_html .= 'Filtering by: '.implode('; ', $filters).'. ';
                 }
 
-                if ($search_request['page'] > 0 && $search_request['paginate_total'] > 0) {
+                if ($search_request['page'] > 0 && $search_request['paginate_total'] > 0 && $search_request['paginate_last_page'] > 1) {
                     $row_html .= 'Showing page '.$search_request['paginate_current_page'].' of '.$search_request['paginate_last_page'].'. ';
                     if ($search_request['paginate_last_page'] > 1) {
                         $row_html .= $search_request['paginate_per_page'].' records per page.';
