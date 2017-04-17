@@ -99,30 +99,14 @@ trait ControllerTrait
             if (isset($attached_allocations)) {
                 return $attached_allocations;
             } else {
-                $method_name = camel_case($method_source);
 
                 if (isset($attached_method_source)) {
                     return $model->$attached_method_source();
                 }
 
                 $model = new $class_name();
-                $relation = $model->$method_name();
 
-                $relation_class = basename(str_replace('\\', '/', get_class($relation)));
-
-                switch ($relation_class) {
-                    case 'BelongsTo':
-                    case 'HasOne':
-                        $model_key_name = $relation->getForeignKey();
-                        break;
-                    case 'BelongsToMany':
-                        $model_key_name = $relation->getQualifiedRelatedKeyName();
-                        break;
-                }
-
-                $query = $model->whereHas($method_name, function ($sub_query) use ($model_key_name, $model_id) {
-                    $sub_query->where($model_key_name, $model_id);
-                });
+                $query = $this->getRelationQuery($model, $method_source);
 
                 if (method_exists($query, 'onlyActive')) {
                     $query = $query->onlyActive();
@@ -140,31 +124,14 @@ trait ControllerTrait
             if (isset($unattached_allocations)) {
                 return $unattached_allocations;
             } else {
-                $method_name = camel_case($method_source);
 
                 if (isset($unattached_method_source)) {
                     return $model->$unattached_method_source();
                 }
 
                 $model = new $class_name();
-                $relation = $model->$method_name();
-                $relation_class = basename(str_replace('\\', '/', get_class($relation)));
 
-                switch ($relation_class) {
-                    case 'BelongsTo':
-                    case 'HasOne':
-                        $model_key_name = $relation->getForeignKey();
-                        break;
-                    case 'BelongsToMany':
-                        $model_key_name = $relation->getQualifiedRelatedKeyName();
-                        break;
-                }
-
-                $list = $model->whereHas($method_name, function ($sub_query) use ($model_key_name, $model_id) {
-                    $sub_query->where($model_key_name, $model_id);
-                });
-
-                $list = $list->select($model->getTable().'.id')->pluck('id')->all();
+                $list = $this->getRelationQuery($model, $method_source)->select($model->getTable().'.id')->pluck('id')->all();
 
                 $query = $class_name::whereNotIn($model->getTable().'.id', $list);
 
@@ -185,6 +152,39 @@ trait ControllerTrait
         }
 
         return $query;
+    }
+
+    /**
+     * Get the relation query.
+     *
+     * @param  mixed  $model
+     * @param  string $method_source
+     *
+     * @return
+     */
+    private function getRelationQuery($model, $method_source)
+    {
+        $method_name = camel_case($method_source);
+        $relation = $model->$method_name();
+        $relation_class = basename(str_replace('\\', '/', get_class($relation)));
+
+        switch ($relation_class) {
+            case 'BelongsTo':
+                $model_key_name = $relation->getForeignKey();
+                break;
+            case 'HasOne':
+                $model_key_name = $relation->getForeignKeyName();
+                break;
+            case 'BelongsToMany':
+                $model_key_name = $relation->getQualifiedRelatedKeyName();
+                break;
+        }
+
+        $model_id = $model->id;
+
+        return $model->whereHas($method_name, function ($sub_query) use ($model_key_name, $model_id) {
+            $sub_query->where($model_key_name, $model_id);
+        });
     }
 
     /**
