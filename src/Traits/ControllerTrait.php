@@ -131,9 +131,9 @@ trait ControllerTrait
 
                 $other_model = new $class_name();
 
-                $list = $this->getRelationQuery($model, $other_model, $method_source)->select($model->getTable().'.id')->pluck('id')->all();
+                $list = $this->getRelationQuery($model, $other_model, $method_source)->select($other_model->getTable().'.id')->pluck('id')->all();
 
-                $query = $class_name::whereNotIn($model->getTable().'.id', $list);
+                $query = $class_name::whereNotIn($other_model->getTable().'.id', $list);
 
                 if (method_exists($query, 'onlyActive')) {
                     $query = $query->onlyActive();
