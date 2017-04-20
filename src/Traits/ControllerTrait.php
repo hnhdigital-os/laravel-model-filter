@@ -104,9 +104,9 @@ trait ControllerTrait
                     return $model->$attached_method_source();
                 }
 
-                $model = new $class_name();
+                $other_model = new $class_name();
 
-                $query = $this->getRelationQuery($model, $method_source);
+                $query = $this->getRelationQuery($model, $other_model, $method_source);
 
                 if (method_exists($query, 'onlyActive')) {
                     $query = $query->onlyActive();
@@ -129,9 +129,9 @@ trait ControllerTrait
                     return $model->$unattached_method_source();
                 }
 
-                $model = new $class_name();
+                $other_model = new $class_name();
 
-                $list = $this->getRelationQuery($model, $method_source)->select($model->getTable().'.id')->pluck('id')->all();
+                $list = $this->getRelationQuery($model, $other_model, $method_source)->select($model->getTable().'.id')->pluck('id')->all();
 
                 $query = $class_name::whereNotIn($model->getTable().'.id', $list);
 
@@ -162,10 +162,10 @@ trait ControllerTrait
      *
      * @return
      */
-    private function getRelationQuery($model, $method_source)
+    private function getRelationQuery($model, $other_model, $method_source)
     {
         $method_name = camel_case($method_source);
-        $relation = $model->$method_name();
+        $relation = $other_model->$method_name();
         $relation_class = basename(str_replace('\\', '/', get_class($relation)));
 
         switch ($relation_class) {
@@ -182,7 +182,7 @@ trait ControllerTrait
 
         $model_id = $model->id;
 
-        return $model->whereHas($method_name, function ($sub_query) use ($model_key_name, $model_id) {
+        return $other_model->whereHas($method_name, function ($sub_query) use ($model_key_name, $model_id) {
             $sub_query->where($model_key_name, $model_id);
         });
     }
