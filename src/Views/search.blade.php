@@ -1,6 +1,7 @@
 @if(config('dynamic_filter.no_search_js', true))
 <script src="{{ config('dynamic_filter.search_js_url', Resource::elixir('vendor/bluora/laravel-dynamic-filter/search.js')) }}" defer></script>
 @endif
+<link rel="stylesheet" type="text/css" href="{{ config('dynamic_filter.search_js_url', Resource::elixir('vendor/bluora/laravel-dynamic-filter/search.css')) }}" defer>
 
     @capturestart
     <p class="form-group">
@@ -80,25 +81,29 @@
       <li class="search-count"><a href="#">{!! $result->get('count', 0) !!}</a></li>
       @if(!$setup->get('tab.search_pagination.hide', false))
       @capturestart
-      <li class="search-buttons" style="float:right;">
-        <a class="search-result-last {!! ($result->get('right_arrow', false)) ? 'btn-primary btn-outline' : '' !!} fa fa-step-forward" aria-hidden="true" style="font-size:2em;padding: 0 5px 0 5px;" data-change-page="{!! $result->get('search.filters.paginate_last_page', 0) !!}"></a>
-      </li>
-      <li class="search-buttons" style="float:right;">
-        <a class="search-result-down {!! ($result->get('right_arrow', false)) ? 'btn-primary btn-outline' : '' !!} fa fa-chevron-circle-right" aria-hidden="true" style="font-size:2em;padding: 0 5px 0 5px;" data-change-page="{!! $result->get('right_arrow_page', 0) !!}"></a>
-      </li>
-      <li class="dropdown search-items-per-page-pulldown" style="float:right;">
-        {!! Html::input()->type('hidden')->name('change_page')->addClass('search-field')->value($setup->get('search.filters.change_page', '0')) !!}
-        {!! Html::input()->type('hidden')->name('items_per_page')->addClass('search-field')->value($setup->get('search.filters.items_per_page', '0')) !!}
-        {!! Html::a()->scriptLink('Opens search items per page')->addClass('dropdown-toggle')->data('toggle', 'dropdown')->aria('haspopup', 'true')->aria('expanded', 'false')->style('padding: 10px 5px 10px 5px;')->text('Show 20<span class="caret"></span>') !!}
-        <ul class="dropdown-menu search-items-per-page">
-          {!! $result->get('items_per_page') !!}
-        </ul>
-      </li>
-      <li class="search-buttons" style="float:right;">
-        <a class="search-result-up {!! ($result->get('left_arrow', false)) ? 'btn-primary btn-outline' : '' !!} fa fa-chevron-circle-left" aria-hidden="true" style="font-size:2em;padding: 0 5px 0 5px;" data-change-page="{!! $result->get('left_arrow_page', 0) !!}"></a>
-      </li>
-      <li class="search-buttons" style="float:right;">
-        <a class="search-result-first {!! ($result->get('left_arrow', false)) ? 'btn-primary btn-outline' : '' !!} fa fa-step-backward" aria-hidden="true" style="font-size:2em;padding: 0 5px 0 5px;" data-change-page="1"></a>
+      <li style="float:right;padding-top:8px;">
+        <span class="search-buttons">
+          <a class="search-result-first {!! ($result->get('left_arrow', false)) ? 'btn-primary btn-outline' : '' !!} fa fa-step-backward" aria-hidden="true" style="font-size:2em;padding: 0 5px 0 5px;" data-change-page="1"></a>
+        </span>
+        <span class="search-buttons">
+          <a class="search-result-up {!! ($result->get('left_arrow', false)) ? 'btn-primary btn-outline' : '' !!} fa fa-chevron-circle-left" aria-hidden="true" style="font-size:2em;padding: 0 5px 0 5px;" data-change-page="{!! $result->get('left_arrow_page', 0) !!}"></a>
+        </span>
+        <span style="display: none;">
+          <span class="dropdown search-items-per-page-pulldown">
+            {!! Html::input()->type('hidden')->name('change_page')->addClass('search-field')->value($setup->get('search.filters.change_page', '0')) !!}
+            {!! Html::input()->type('hidden')->name('items_per_page')->addClass('search-field')->value($setup->get('search.filters.items_per_page', '0')) !!}
+            {!! Html::a()->scriptLink('Opens search items per page')->addClass('dropdown-toggle')->data('toggle', 'dropdown')->aria('haspopup', 'true')->aria('expanded', 'false')->style('padding: 10px 5px 10px 5px;')->text('Show 20<span class="caret"></span>') !!}
+            <ul class="dropdown-menu search-items-per-page">
+              {!! $result->get('items_per_page') !!}
+            </ul>
+          </span>
+        </span>
+        <span class="search-buttons">
+          <a class="search-result-down {!! ($result->get('right_arrow', false)) ? 'btn-primary btn-outline' : '' !!} fa fa-chevron-circle-right" aria-hidden="true" style="font-size:2em;padding: 0 5px 0 5px;" data-change-page="{!! $result->get('right_arrow_page', 0) !!}"></a>
+        </span>
+        <span class="search-buttons">
+          <a class="search-result-last {!! ($result->get('right_arrow', false)) ? 'btn-primary btn-outline' : '' !!} fa fa-step-forward" aria-hidden="true" style="font-size:2em;padding: 0 5px 0 5px;" data-change-page="{!! $result->get('search.filters.paginate_last_page', 0) !!}"></a>
+        </span>
       </li>
       @capturestop("result_navigation")
       @raw(echo $result_navigation)
