@@ -81,7 +81,7 @@
       <li class="search-count"><a href="#">{!! $result->get('count', 0) !!}</a></li>
       @if(!$setup->get('tab.search_pagination.hide', false))
       @capturestart
-      <li style="float:right;padding-top:8px;">
+      <li style="float:right;padding-top:8px;text-align: center;">
         <span class="search-buttons">
           <a class="search-result-first {!! ($result->get('left_arrow', false)) ? 'btn-primary btn-outline' : '' !!} fa fa-step-backward" aria-hidden="true" style="font-size:2em;padding: 0 5px 0 5px;" data-change-page="1"></a>
         </span>
