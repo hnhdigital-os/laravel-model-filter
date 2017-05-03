@@ -703,24 +703,41 @@ trait ModelTrait
             $relation = $this->$relation_name();
             $relation_class = basename(str_replace('\\', '/', get_class($relation)));
 
-            if ($relation_class === 'HasOne') {
+            if ($relation_class === 'HasOne' || $relation_class === 'BelongsTo') {
                 $table = $relation->getRelated()->getTable();
             } else {
                 $table = $relation->getTable();
             }
 
-            $qualified_parent_key_name = $relation->getQualifiedParentKeyName();
-            $foreign_key = $relation->getForeignKey();
+            switch ($relation_class) {
+                case 'BelongsTo':
+                    $parent_key = $relation->getQualifiedForeignKey();
+                    $foreign_key = $relation->getQualifiedOwnerKeyName();
+                break;
+                case 'HasOne':
+                    $parent_key = $table.'.'.$relation->getParentKey();
+                    $foreign_key = $table.'.'.$relation->getForeignKey();
+                break;
+                case 'HasMany':
+                    $parent_key = $relation->getQualifiedOwnerKeyName();
+                    $foreign_key = $relation->getQualifiedForeignKey();
+                break;
+                case 'BelongsToMany':
+                    $parent_key = $relation->getQualifiedParentKeyName();
+                    $foreign_key = $relation->getQualifiedForeignKeyName();
+                    $related_foreign_key = $relation->getQualifiedRelatedKeyName();
+                break;
+
+            }
 
             foreach (\Schema::getColumnListing($table) as $related_column) {
                 $query = $query->addSelect(new Expression("`$table`.`$related_column` AS `$table.$related_column`"));
             }
-            $query = $query->join($table, $qualified_parent_key_name, $operator, $foreign_key, $type, $where);
+            $query = $query->join($table, $parent_key, $operator, $foreign_key, $type, $where);
 
             if ($relation_class === 'BelongsToMany') {
                 $related_relation = $relation->getRelated();
                 $related_table = $related_relation->getTable();
-                $related_foreign_key = $table.'.'.$related_relation->getForeignKey();
                 $related_qualified_key_name = $related_relation->getQualifiedKeyName();
                 $query = $query->join($related_table, $related_qualified_key_name, $operator, $related_foreign_key, $type, $where);
             }
