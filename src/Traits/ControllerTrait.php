@@ -233,6 +233,12 @@ trait ControllerTrait
         static::defaultPagination($session);
         (isset($session['filters'])) ?: $session['filters'] = [];
 
+        if (!is_null(request()->filters)) {
+            foreach (request()->filters as $key => $value) {
+                $session['filters'][$key] = [$value];
+            }
+        }
+
         // Get the session saved filters
         return $session;
     }

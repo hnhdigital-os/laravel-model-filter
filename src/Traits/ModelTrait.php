@@ -352,84 +352,86 @@ trait ModelTrait
         $model = (new static());
         foreach ($filter_requests as $filter_request) {
             // Clean inputs
-            (!isset($filter_request[1])) ? $filter_request[1] = '' : false;
-            (!isset($filter_request[2])) ? $filter_request[2] = '' : false;
-            list($operator, $value1, $value2) = $filter_request;
+            if (is_array( $filter_request)) {
+                (!isset($filter_request[1])) ? $filter_request[1] = '' : false;
+                (!isset($filter_request[2])) ? $filter_request[2] = '' : false;
+                list($operator, $value1, $value2) = $filter_request;
 
-            // User can override the field being checked
-            if (!empty($value1) && $value1[0] === '#' && isset($model->attribute_rules)) {
-                $available_attributes = array_keys($model->attribute_rules);
-                $available_operators = array_keys($model->getFilterOperators('string'));
-                $value1_array = explode(' ', $value1);
-                $total_input = count($value1_array);
+                // User can override the field being checked
+                if (!empty($value1) && $value1[0] === '#' && isset($model->attribute_rules)) {
+                    $available_attributes = array_keys($model->attribute_rules);
+                    $available_operators = array_keys($model->getFilterOperators('string'));
+                    $value1_array = explode(' ', $value1);
+                    $total_input = count($value1_array);
 
-                if ($total_input >= 2) {
-                    $override_attribute = array_shift($value1_array);
-                    $override_operator = array_shift($value1_array);
-                    $override_value1 = implode(' ', $value1_array);
+                    if ($total_input >= 2) {
+                        $override_attribute = array_shift($value1_array);
+                        $override_operator = array_shift($value1_array);
+                        $override_value1 = implode(' ', $value1_array);
 
-                    if ($total_input == 2
-                        && in_array($override_operator, ['EMPTY', 'NOT_EMPTY', 'NULL', 'NOT NULL'])) {
-                        $filter_setting['attribute'] = substr($override_attribute, 1);
-                        $operator = $override_operator;
-                        $value1 = '';
-                    } elseif ($total_input == 2) {
-                        $operator = '=';
-                        $value1 = $override_operator;
-                    } elseif ($total_input > 2 && in_array($override_operator, $available_operators)) {
-                        $filter_setting['attribute'] = substr($override_attribute, 1);
-                        $operator = $override_operator;
-                        $value1 = $override_value1;
-                    }
-                }
-            }
-
-            // User can override the operator inline
-            if (empty($operator) || $operator === '*=*') {
-                $value1_array = explode(' ', $value1);
-                $check_operator = array_shift($value1_array);
-                if (count($value1_array)) {
-                    $check_operator = trim($check_operator);
-                    if (!empty($check_operator)) {
-                        $available_operators = array_keys($model->getFilterOperators($filter_setting['filter']));
-                        if (in_array($check_operator, $available_operators)) {
-                            $operator = $check_operator;
-                            $value1 = implode(' ', $value1_array);
+                        if ($total_input == 2
+                            && in_array($override_operator, ['EMPTY', 'NOT_EMPTY', 'NULL', 'NOT NULL'])) {
+                            $filter_setting['attribute'] = substr($override_attribute, 1);
+                            $operator = $override_operator;
+                            $value1 = '';
+                        } elseif ($total_input == 2) {
+                            $operator = '=';
+                            $value1 = $override_operator;
+                        } elseif ($total_input > 2 && in_array($override_operator, $available_operators)) {
+                            $filter_setting['attribute'] = substr($override_attribute, 1);
+                            $operator = $override_operator;
+                            $value1 = $override_value1;
                         }
                     }
                 }
-            }
 
-            // No operator provided, use the model default, or equals.
-            if (empty($operator) && isset($model->filter_default_operator)) {
-                $operator = $model->filter_default_operator;
-            } elseif (empty($operator)) {
-                $operator = '=';
-            }
-
-            $attribute = $filter_setting['attribute'];
-            $method = 'where';
-            $arguments = [];
-            $positive = !(stripos($operator, '!') !== false || stripos($operator, 'NOT') !== false);
-
-            if (static::validateOperators($filter_setting['filter'], $method, $arguments, $model, $filter_setting, $operator, $value1, $value2)) {
-                if (is_array($attribute)) {
-                    foreach ($attribute as &$value) {
-                        $value = DB::raw($value);
-                    }
-                    $query = $query->where(function ($sub_query) use ($attribute, $method, $arguments, $positive) {
-                        return static::applyFilterAttributeArray($sub_query, $attribute, $method, $arguments, $positive);
-                    });
-                } else {
-                    if (is_array($arguments)) {
-                        if (($method === 'whereIn' || $method === 'whereNotIn')
-                            && empty($arguments[0])) {
-                            break;
+                // User can override the operator inline
+                if (empty($operator) || $operator === '*=*') {
+                    $value1_array = explode(' ', $value1);
+                    $check_operator = array_shift($value1_array);
+                    if (count($value1_array)) {
+                        $check_operator = trim($check_operator);
+                        if (!empty($check_operator)) {
+                            $available_operators = array_keys($model->getFilterOperators($filter_setting['filter']));
+                            if (in_array($check_operator, $available_operators)) {
+                                $operator = $check_operator;
+                                $value1 = implode(' ', $value1_array);
+                            }
                         }
-                        array_unshift($arguments, DB::raw($attribute));
-                        $query = $query->$method(...$arguments);
+                    }
+                }
+
+                // No operator provided, use the model default, or equals.
+                if (empty($operator) && isset($model->filter_default_operator)) {
+                    $operator = $model->filter_default_operator;
+                } elseif (empty($operator)) {
+                    $operator = '=';
+                }
+
+                $attribute = $filter_setting['attribute'];
+                $method = 'where';
+                $arguments = [];
+                $positive = !(stripos($operator, '!') !== false || stripos($operator, 'NOT') !== false);
+
+                if (static::validateOperators($filter_setting['filter'], $method, $arguments, $model, $filter_setting, $operator, $value1, $value2)) {
+                    if (is_array($attribute)) {
+                        foreach ($attribute as &$value) {
+                            $value = DB::raw($value);
+                        }
+                        $query = $query->where(function ($sub_query) use ($attribute, $method, $arguments, $positive) {
+                            return static::applyFilterAttributeArray($sub_query, $attribute, $method, $arguments, $positive);
+                        });
                     } else {
-                        $query = $query->$method($attribute.$arguments);
+                        if (is_array($arguments)) {
+                            if (($method === 'whereIn' || $method === 'whereNotIn')
+                                && empty($arguments[0])) {
+                                break;
+                            }
+                            array_unshift($arguments, DB::raw($attribute));
+                            $query = $query->$method(...$arguments);
+                        } else {
+                            $query = $query->$method($attribute.$arguments);
+                        }
                     }
                 }
             }
