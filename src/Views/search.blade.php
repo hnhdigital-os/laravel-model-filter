@@ -34,7 +34,7 @@
     {!! Html::a('Close')->href('Close')->addClass('action-close-save-filter btn btn-default')->data('dismiss', 'modal') !!}
     @capturestop('modal_footer_left')
 
-@include('common.module.content.modal', ['modal' => ['id' => 'action-save-filter', 'header_left' => 'Save '.$app_model_title.' Filter', 'content' => $modal_content, 'footer_left' => $modal_footer_left, 'footer_right' => $modal_footer_right]])
+@include('inspinia::module.content.modal', ['modal' => ['id' => 'action-save-filter', 'header_left' => 'Save '.$app_model_title.' Filter', 'content' => $modal_content, 'footer_left' => $modal_footer_left, 'footer_right' => $modal_footer_right]])
 
 <div id="{!! $setup->get('search.name') !!}" data-search-request="{!! $setup->get('search.search_request') !!}" data-search-model="{!! $setup->get('search.model', '') !!}" data-search-controller="{!! $setup->get('search.controller', '') !!}" data-search-base="{!! $setup->get('search.base', '') !!}" data-search-method="{!! $setup->get('search.method', '') !!}" class="common-module-content-search {!! $layout_div_class !!}">
 @html(input()->type('hidden')->name('route')->addClass('search-field')->value(Route::current()->getName()))
@@ -154,7 +154,7 @@
               <label class="col-md-2 control-label">Saved filters:</label>
               <div class="col-md-10">
                 <div class="input-group">
-                  {!! Html::select()->addClass('form-control action-load-filter select2')->style('width:100%;')->data('select2-placeholder', 'Load a saved filter from the list and apply to results:')->data('select2-allow-clear', true)->addOptionsArray($model_filter_options, 0, 1) !!}
+                  {!! Html::select()->addClass('form-control action-load-filter init-select2')->style('width:100%;')->data('select2-placeholder', 'Load a saved filter from the list and apply to results:')->data('select2-allow-clear', true)->addOptionsArray($model_filter_options, 0, 1) !!}
                   <span class="input-group-btn">
                     <button type="button" class="btn btn-primary">Load</button>
                   </span>
@@ -165,7 +165,7 @@
               <label class="col-md-2 control-label">Available fields:</label>
               <div class="col-md-10">
                 <div class="input-group">
-                  {!! Html::select()->addClass('form-control action-add-filter select2')->style('width:100%;')->data('select2-placeholder', 'Add a field from the list to filter results:')->data('select2-allow-clear', true)->addOptionsArray($filter_options, 0, 1) !!}
+                  {!! Html::select()->addClass('form-control action-add-filter init-select2')->style('width:100%;')->data('select2-placeholder', 'Add a field from the list to filter results:')->data('select2-allow-clear', true)->addOptionsArray($filter_options, 0, 1) !!}
                   <span class="input-group-btn">
                     <button type="button" class="btn btn-primary">Add</button>
                   </span>
@@ -201,8 +201,8 @@
               </div>
               <div class="col-md-7"></div>
               <label class="col-md-3 control-label">
-                {!! Html::createElement('button')->type('submit')->addClass('btn btn-primary action-apply-filter ladda-button')->text('Apply')->data('style', 'expand-right') !!}
-                {!! Html::createElement('a')->addClass('btn btn-info action-save-filter ladda-button')->text('Save filter')->href('#action-save-filter')->data('style', 'expand-right')->data('toggle', 'modal') !!}
+                {!! Html::createElement('button')->type('submit')->addClass('btn btn-primary action-apply-filter ladda-button init-ladda')->text('Apply')->data('style', 'expand-right') !!}
+                {!! Html::createElement('a')->addClass('btn btn-info action-save-filter ladda-button init-ladda')->text('Save filter')->href('#action-save-filter')->data('style', 'expand-right')->data('toggle', 'modal') !!}
               </label>
             </div>
             @foreach($filter_types as $type)

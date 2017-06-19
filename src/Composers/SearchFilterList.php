@@ -45,7 +45,7 @@ class SearchFilterList
             $column1 = $view_data['filter_settings']['name'];
             $column2 = Html::select()->name($view_data['filter_name'].'_operator[]')->addClass('search-operator form-control')
                 ->style('width:100%;')->addOptionsArray($view_data['operator_options'], 'value', 'name', $view_data['filter'][0]);
-            $column3 = Html::select()->name($view_data['filter_name'].'_value1[]')->addClass('search-value1 form-control select2')
+            $column3 = Html::select()->name($view_data['filter_name'].'_value1[]')->addClass('search-value1 form-control init-select2')
                 ->style('width:100%;')->addOptionsArray($view_data['list_filter_options'][$view_data['filter_name']], 0, 1, $view_data['filter'][1])->multiple()
                 ->data('placeholder', 'Select one or many...')->data('tags', 'true')->data('multiple', 'true')->data('allow-clear', 'true');
         }
