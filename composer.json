@@ -1,17 +1,17 @@
 {
-    "name": "bluora/laravel-dynamic-filter",
+    "name": "hnhdigital-os/laravel-dynamic-filter",
     "description": "Provides dynamic attribute filtering for Laravel's Eloquent Model.",
     "keywords": ["laravel","illuminate","eloquent", "dynamic", "filtering"],
     "license": "MIT",
     "authors": [
         {
             "name": "Rocco Howard",
-            "email": "rocco@bluora.com.au"
+            "email": "rocco@hnh.digital"
         }
     ],
     "require": {
         "php": ">=5.4.0",
-        "bluora/laravel-html-generator": "dev-master"
+        "hnhdigital-os/laravel-html-generator": "dev-master"
     },
     "require-dev": {
         "phpunit/phpunit": "4.*",
