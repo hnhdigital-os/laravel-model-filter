@@ -95,13 +95,17 @@ trait ControllerTrait
         $other_model = (!isset($other_model)) ? camel_case($current_model) : $other_model;
 
         // Build query
-        if (stripos($route_name, $current_model.'::view') !== false || $search_tab == $attached_tab) {
+        if ($search_tab == $attached_tab) {
             if (isset($attached_allocations)) {
                 return $attached_allocations;
             } else {
 
                 if (isset($attached_method_source)) {
                     return $model->$attached_method_source();
+                }
+
+                if (isset($override_attached_method_source)) {
+                    $method_source = $override_attached_method_source;
                 }
 
                 $other_model = new $class_name();
@@ -127,6 +131,10 @@ trait ControllerTrait
 
                 if (isset($unattached_method_source)) {
                     return $model->$unattached_method_source();
+                }
+
+                if (isset($override_unattached_method_source)) {
+                    $method_source = $override_unattached_method_source;
                 }
 
                 $other_model = new $class_name();
