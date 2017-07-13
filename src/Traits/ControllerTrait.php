@@ -4,7 +4,6 @@ namespace Bluora\LaravelDynamicFilter\Traits;
 
 use Bluora\LaravelDynamicFilter\Objects\SearchViewOptions;
 use Bluora\LaravelDynamicFilter\Objects\SearchViewResult;
-use Bluora\LaravelDynamicFilterl;
 use Html;
 use Illuminate\Http\Request as HttpRequest;
 use Illuminate\Pagination\Paginator;
@@ -99,7 +98,6 @@ trait ControllerTrait
             if (isset($attached_allocations)) {
                 return $attached_allocations;
             } else {
-
                 if (isset($attached_method_source)) {
                     return $model->$attached_method_source();
                 }
@@ -128,7 +126,6 @@ trait ControllerTrait
             if (isset($unattached_allocations)) {
                 return $unattached_allocations;
             } else {
-
                 if (isset($unattached_method_source)) {
                     return $model->$unattached_method_source();
                 }
@@ -165,8 +162,8 @@ trait ControllerTrait
     /**
      * Get the relation query.
      *
-     * @param  mixed  $model
-     * @param  string $method_source
+     * @param mixed  $model
+     * @param string $method_source
      *
      * @return
      */

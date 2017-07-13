@@ -124,7 +124,6 @@ class SearchPage
             $setup = $view_data['search_data']['setup'];
         }
 
-
         $view->with('layout_div_class', $layout_div_class)
             ->with('search_data', $view_data['search_data'])
             ->with('setup', $view_data['search_data']['setup'])
