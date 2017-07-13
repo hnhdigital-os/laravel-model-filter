@@ -8,22 +8,20 @@ Provides the ability to set filtering attributes and model relationship filterin
 
 This package has been developed by H&H|Digital, an Australian botique developer. Visit us at [hnh.digital](http://hnh.digital).
 
-## Installation
+## Install
 
-Require this package in your `composer.json` file:
+Via composer:
 
-`"hnhdigital-os/laravel-dynamic-filter": "dev-master"`
-
-Then run `composer update` to download the package to your vendor directory.
+`$ composer require hnhdigital-os/laravel-dynamic-filter dev-master`
 
 ## Usage
 
 ```php
-use Bluora\LaravelDynamicFilter\DynamicFilterTrait;
+use Bluora\LaravelDynamicFilter\Traits\ModelTrait;
 
 class User extends Model
 {
-    use DynamicFilterTrait;
+    use ModelTrait;
 
     /**
      * A nice name for the model.
