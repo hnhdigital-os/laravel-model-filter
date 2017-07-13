@@ -18,7 +18,7 @@ trait ModelTrait
         'date',
         'boolean',
         'list',
-        'listLookup'
+        'listLookup',
     ];
 
     /**
@@ -352,7 +352,7 @@ trait ModelTrait
         $model = (new static());
         foreach ($filter_requests as $filter_request) {
             // Clean inputs
-            if (is_array( $filter_request)) {
+            if (is_array($filter_request)) {
                 (!isset($filter_request[1])) ? $filter_request[1] = '' : false;
                 (!isset($filter_request[2])) ? $filter_request[2] = '' : false;
                 list($operator, $value1, $value2) = $filter_request;
@@ -463,7 +463,7 @@ trait ModelTrait
                     $value1_numeric = substr($value1_numeric, 1);
                 }
                 $new_value1 = '';
-                for ($pos=0; $pos < strlen($value1_numeric); $pos++) { 
+                for ($pos = 0; $pos < strlen($value1_numeric); $pos++) {
                     $new_value1 .= substr($value1_numeric, $pos, 1).'%';
                 }
                 $value1 = $new_value1;
@@ -562,6 +562,7 @@ trait ModelTrait
                         return true;
                     case 'NULL':
                         $method = 'whereNull';
+
                         return true;
                     case 'NOT_NULL':
                         $method = 'whereNotNull';
@@ -618,7 +619,7 @@ trait ModelTrait
     /**
      * Get array of values from an input string.
      *
-     * @param  string $string
+     * @param string $string
      *
      * @return array
      */
