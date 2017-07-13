@@ -683,7 +683,6 @@ trait ModelTrait
     /**
      * This determines the foreign key relations automatically to prevent the need to figure out the columns.
      *
-     /**
      * @param \Illuminate\Database\Query\Builder $query
      * @param string                             $relation_name
      * @param string                             $operator
