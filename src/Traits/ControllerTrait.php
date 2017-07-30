@@ -613,7 +613,18 @@ trait ControllerTrait
 
             $view_data[$variable]['result']->setArray($search_result);
 
-            $search_request_path = (array_has($view_settings, 'search-request-path')) ? array_get($view_settings, 'search-request-path') : '/'.$page.'/'.((array_get($view_settings, 'no_uuid', false) ? '' : $model->uuid.'/')).$method.'Result';
+            $search_request_path = array_has($view_settings, 'search-request-path') ? array_get($view_settings, 'search-request-path') : '/'.$page.'/';
+
+            if (!array_get($view_settings, 'no_uuid', false))  {
+                if (stripos($search_request_path, '{id}') !== false) {
+                    $search_request_path = str_replace('{id}', $model->uuid, $search_request_path);
+                    $page = str_replace('{id}', $model->uuid, $page);
+                } else {
+                    $search_request_path .= $model->uuid.'/';
+                }
+            }
+
+            $search_request_path .= $method.'Result';
 
             $view_data[$variable]['setup']
                 ->set('search.layout-style', 'inline')
