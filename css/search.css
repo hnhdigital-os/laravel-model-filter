@@ -11,3 +11,12 @@
     color: rgb(167, 177, 194);
     background: none;
 }
+
+.common-module-content-search .table th,
+.common-module-content-search .table th,
+.common-module-content-search .table th,
+.common-module-content-search .table td,
+.common-module-content-search .table td,
+.common-module-content-search .table td {
+    border:none;
+}
