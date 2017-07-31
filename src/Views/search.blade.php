@@ -113,7 +113,7 @@
     <div class="tab-content">
       <div id="{!! $setup->get('search.name') !!}-tab-1" class="tab-pane active">
         <div class="table-responsive">
-          <table class="table table-striped table-hover">
+          <table class="table {!! $setup->get('table.classes', 'table-striped table-hover') !!}">
             <colgroup>
               @for($c = 0; $c < $setup->get('colgroup.total', 1); $c++)
               <col {!! $setup->get('colgroup.'.$c.'.col', '') !!} {!! $setup->has('colgroup.'.$c.'.width') ? 'width="'.$setup->get('colgroup.'.$c.'.width').'"' : '' !!}>
