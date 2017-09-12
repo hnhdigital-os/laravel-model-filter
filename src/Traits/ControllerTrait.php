@@ -624,7 +624,9 @@ trait ControllerTrait
                 }
             }
 
-            $search_request_path .= $method.'Result';
+            if (!array_has($view_settings, 'search-request-path')) {
+                $search_request_path .= $method.'Result';
+            }
 
             $view_data[$variable]['setup']
                 ->set('search.layout-style', 'inline')
