@@ -100,8 +100,14 @@ class SearchPage
                         }
                     }
 
+                    $model_attribute = 'model_id';
+
+                    if (isset(ModelFilter::$modelKey)) {
+                        $model_attribute = ModelFilter::$modelKey;
+                    }
+
                     // Load any saved filters
-                    $original_model_filter_options = ModelFilter::where('model_id', $app_model->id)->get();
+                    $original_model_filter_options = ModelFilter::where($model_attribute, $app_model->id)->get();
                     $model_filter_options[] = ['', ''];
                     foreach ($original_model_filter_options as $filter_option) {
                         $model_filter_options[] = [$filter_option->uuid, $filter_option->name];
