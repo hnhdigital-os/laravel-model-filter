@@ -27,7 +27,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "HnhDigital\\LaraveModelFilter\\ServiceProvider"
+                "HnhDigital\\LaravelModelFilter\\ServiceProvider"
             ]
         }
     }
