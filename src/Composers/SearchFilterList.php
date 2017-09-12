@@ -1,6 +1,6 @@
 <?php
 
-namespace Bluora\LaravelDynamicFilter\Composers;
+namespace HnhDigital\LaravelModelFilter\Composers;
 
 use Bluora\LaravelHtmlGenerator\Html;
 use Illuminate\Contracts\View\View;

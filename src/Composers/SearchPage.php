@@ -1,9 +1,11 @@
 <?php
 
-namespace Bluora\LaravelDynamicFilter\Composers;
+namespace HnhDigital\LaravelModelFilter\Composers;
 
 use App\Models\AppModel;
 use App\Models\ModelFilter;
+use HnhDigital\LaravelModelFilter\Objects\SearchViewOptions;
+use HnhDigital\LaravelModelFilter\Objects\SearchViewResult;
 use Illuminate\Contracts\View\View;
 
 class SearchPage
@@ -126,7 +128,7 @@ class SearchPage
                 $layout_div_class = 'wrapper wrapper-content animated fadeInRight';
             }
         } else {
-            $view_data['search_data'] = ['setup' => new \Bluora\LaravelDynamicFilter\Objects\SearchViewOptions(), 'result' => new \Bluora\LaravelDynamicFilter\Objects\SearchViewResult()];
+            $view_data['search_data'] = ['setup' => new SearchViewOptions(), 'result' => new SearchViewResult()];
             $setup = $view_data['search_data']['setup'];
         }
 

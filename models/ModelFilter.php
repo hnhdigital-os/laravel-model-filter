@@ -2,18 +2,12 @@
 
 namespace App\Models;
 
-use Bluora\LaravelDynamicFilter\Traits\ModelTrait as DynamicFilterTrait;
-use Bluora\LaravelModelChangeTracking\LogChangeTrait;
-use Bluora\LaravelModelChangeTracking\LogStateChangeTrait;
-use Bluora\LaravelModelTraits\ModelStateTrait;
-use Bluora\LaravelModelTraits\ModelValidationTrait;
-use Bluora\LaravelModelTraits\OrderByTrait;
-use Bluora\LaravelModelUuid\UuidTrait;
+use HnhDigital\LaravelModelFilter\Traits\ModelTrait as ModelFilterTrait;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class ModelFilter extends BaseModel
 {
-    use LogChangeTrait, LogStateChangeTrait, DynamicFilterTrait, ModelStateTrait, ModelValidationTrait, OrderByTrait, UuidTrait, SoftDeletes;
+    use ModelFilterTrait, SoftDeletes;
 
     /**
      * The database table used by the model.

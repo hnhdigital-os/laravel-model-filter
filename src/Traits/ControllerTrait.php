@@ -1,9 +1,9 @@
 <?php
 
-namespace Bluora\LaravelDynamicFilter\Traits;
+namespace HnhDigital\LaravelModelFilter\Traits;
 
-use Bluora\LaravelDynamicFilter\Objects\SearchViewOptions;
-use Bluora\LaravelDynamicFilter\Objects\SearchViewResult;
+use Objects\SearchViewOptions;
+use Objects\SearchViewResult;
 use Html;
 use Illuminate\Http\Request as HttpRequest;
 use Illuminate\Pagination\Paginator;

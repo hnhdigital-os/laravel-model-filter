@@ -1,6 +1,6 @@
 <?php
 
-namespace Bluora\LaravelDynamicFilter\Traits;
+namespace HnhDigital\LaravelModelFilter\Traits;
 
 use DB;
 use Illuminate\Database\Query\Expression;

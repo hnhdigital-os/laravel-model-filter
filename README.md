@@ -2,9 +2,9 @@
 
 Provides the ability to set filtering attributes and model relationship filtering.
 
-[![Latest Stable Version](https://poser.pugx.org/hnhdigital-os/laravel-dynamic-filter/v/stable.svg)](https://packagist.org/packages/hnhdigital-os/laravel-dynamic-filter) [![Total Downloads](https://poser.pugx.org/hnhdigital-os/laravel-dynamic-filter/downloads.svg)](https://packagist.org/packages/hnhdigital-os/laravel-dynamic-filter) [![Latest Unstable Version](https://poser.pugx.org/hnhdigital-os/laravel-dynamic-filter/v/unstable.svg)](https://packagist.org/packages/hnhdigital-os/laravel-dynamic-filter) [![License](https://poser.pugx.org/hnhdigital-os/laravel-dynamic-filter/license.svg)](https://packagist.org/packages/hnhdigital-os/laravel-dynamic-filter)
+[![Latest Stable Version](https://poser.pugx.org/hnhdigital-os/laravel-model-filter/v/stable.svg)](https://packagist.org/packages/hnhdigital-os/laravel-model-filter) [![Total Downloads](https://poser.pugx.org/hnhdigital-os/laravel-model-filter/downloads.svg)](https://packagist.org/packages/hnhdigital-os/laravel-model-filter) [![Latest Unstable Version](https://poser.pugx.org/hnhdigital-os/laravel-model-filter/v/unstable.svg)](https://packagist.org/packages/hnhdigital-os/laravel-model-filter) [![License](https://poser.pugx.org/hnhdigital-os/laravel-model-filter/license.svg)](https://packagist.org/packages/hnhdigital-os/laravel-model-filter)
 
-[![Build Status](https://travis-ci.org/hnhdigital-os/laravel-dynamic-filter.svg?branch=master)](https://travis-ci.org/hnhdigital-os/laravel-dynamic-filter) [![StyleCI](https://styleci.io/repos/61543411/shield?branch=master)](https://styleci.io/repos/61543411) [![Test Coverage](https://codeclimate.com/github/hnhdigital-os/laravel-dynamic-filter/badges/coverage.svg)](https://codeclimate.com/github/hnhdigital-os/laravel-dynamic-filter/coverage) [![Issue Count](https://codeclimate.com/github/hnhdigital-os/laravel-dynamic-filter/badges/issue_count.svg)](https://codeclimate.com/github/hnhdigital-os/laravel-dynamic-filter) [![Code Climate](https://codeclimate.com/github/hnhdigital-os/laravel-dynamic-filter/badges/gpa.svg)](https://codeclimate.com/github/hnhdigital-os/laravel-dynamic-filter) 
+[![Build Status](https://travis-ci.org/hnhdigital-os/laravel-model-filter.svg?branch=master)](https://travis-ci.org/hnhdigital-os/laravel-model-filter) [![StyleCI](https://styleci.io/repos/61543411/shield?branch=master)](https://styleci.io/repos/61543411) [![Test Coverage](https://codeclimate.com/github/hnhdigital-os/laravel-model-filter/badges/coverage.svg)](https://codeclimate.com/github/hnhdigital-os/laravel-model-filter/coverage) [![Issue Count](https://codeclimate.com/github/hnhdigital-os/laravel-model-filter/badges/issue_count.svg)](https://codeclimate.com/github/hnhdigital-os/laravel-model-filter) [![Code Climate](https://codeclimate.com/github/hnhdigital-os/laravel-model-filter/badges/gpa.svg)](https://codeclimate.com/github/hnhdigital-os/laravel-model-filter) 
 
 This package has been developed by H&H|Digital, an Australian botique developer. Visit us at [hnh.digital](http://hnh.digital).
 
@@ -12,12 +12,12 @@ This package has been developed by H&H|Digital, an Australian botique developer.
 
 Via composer:
 
-`$ composer require hnhdigital-os/laravel-dynamic-filter dev-master`
+`$ composer require hnhdigital-os/laravel-model-filter ~1.0`
 
 ## Usage
 
 ```php
-use Bluora\LaravelDynamicFilter\Traits\ModelTrait;
+use HnhDigital\LaravelModelFilter\Traits\ModelTrait;
 
 class User extends Model
 {
@@ -62,13 +62,13 @@ class User extends Model
 
 ## Contributing
 
-Please see [CONTRIBUTING](https://github.com/hnhdigital-os/laravel-dynamic-filter/blob/master/CONTRIBUTING.md) for details.
+Please see [CONTRIBUTING](https://github.com/hnhdigital-os/laravel-model-filter/blob/master/CONTRIBUTING.md) for details.
 
 ## Credits
 
 * [Rocco Howard](https://github.com/therocis)
-* [All Contributors](https://github.com/hnhdigital-os/laravel-dynamic-filter/contributors)
+* [All Contributors](https://github.com/hnhdigital-os/laravel-model-filter/contributors)
 
 ## License
 
-The MIT License (MIT). Please see [License File](https://github.com/hnhdigital-os/laravel-dynamic-filter/blob/master/LICENSE) for more information.
+The MIT License (MIT). Please see [License File](https://github.com/hnhdigital-os/laravel-model-filter/blob/master/LICENSE) for more information.

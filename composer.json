@@ -1,7 +1,7 @@
 {
     "name": "hnhdigital-os/laravel-model-filter",
     "description": "Provides model attribute filtering.",
-    "keywords": ["laravel","illuminate","eloquent", "dynamic", "filtering"],
+    "keywords": ["laravel","illuminate","eloquent", "model", "filtering"],
     "license": "MIT",
     "authors": [
         {
@@ -23,5 +23,12 @@
         "psr-4": {
             "HnhDigital\\LaraveModelFilter\\": "src/"
         }
-    }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "HnhDigital\\LaraveModelFilter\\ServiceProvider"
+            ]
+        }
+    },
 }
