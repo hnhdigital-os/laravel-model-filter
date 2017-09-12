@@ -37,7 +37,7 @@ trait ControllerTrait
         if (!isset($options['model'])) {
             $options['model'] = Route::current()->parameter($options['route_paramater']);
         }
-        $options['model_id'] = (isset($options['model'])) ? $options['model']->id : '';
+        $options['model_id'] = (isset($options['model'])) ? $options['model']->getKey() : '';
 
         $options['route_name'] = (request()->ajax()) ? request()->get('route') : Route::current()->getName();
         $options['route_name'] = (isset($settings['route-name'])) ? $settings['route-name'] : $options['route_name'];
@@ -185,7 +185,7 @@ trait ControllerTrait
                 break;
         }
 
-        $model_id = $model->id;
+        $model_id = $model->getKey();
 
         return $other_model->whereHas($method_name, function ($sub_query) use ($model_key_name, $model_id) {
             $sub_query->where($model_key_name, $model_id);
