@@ -615,7 +615,7 @@ trait ControllerTrait
 
             $search_request_path = array_has($view_settings, 'search-request-path') ? array_get($view_settings, 'search-request-path') : '/'.$page.'/';
 
-            if (!array_get($view_settings, 'no_uuid', false))  {
+            if (!array_get($view_settings, 'no_uuid', false)) {
                 if (stripos($search_request_path, '{id}') !== false) {
                     $search_request_path = str_replace('{id}', $model->uuid, $search_request_path);
                     $page = str_replace('{id}', $model->uuid, $page);
