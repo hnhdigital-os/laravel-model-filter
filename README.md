@@ -14,20 +14,6 @@ Via composer:
 
 `$ composer require hnhdigital-os/laravel-model-filter ~1.0`
 
-## Configuration
-
-This package autoloads from Laravel 5.5.
-
-Enable the service provider (<L5.5) by editing config/app.php:
-
-```php
-    'providers' => [
-        ...
-        HnhDigital\LaravelModelFilter\ServiceProvider::class,
-        ...
-    ];
-```
-
 ## Usage
 
 ```php
