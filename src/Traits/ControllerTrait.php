@@ -2,11 +2,11 @@
 
 namespace HnhDigital\LaravelModelFilter\Traits;
 
-use Objects\SearchViewOptions;
-use Objects\SearchViewResult;
 use Html;
 use Illuminate\Http\Request as HttpRequest;
 use Illuminate\Pagination\Paginator;
+use Objects\SearchViewOptions;
+use Objects\SearchViewResult;
 use Request;
 use Route;
 
