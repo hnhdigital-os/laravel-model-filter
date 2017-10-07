@@ -1,5 +1,5 @@
 @if(config('dynamic_filter.no_search_js', true))
-<script src="{{ config('dynamic_filter.search_js_url', Resource::elixir('vendor/hnhdigital-os/laravel-dynamic-filter/search.js')) }}" defer></script>
+<script src="{{ config('dynamic_filter.search_js_url', Resource::elixir('vendor/hnhdigital-os/laravel-model-filter/search.js')) }}" defer></script>
 @endif
 <link rel="stylesheet" type="text/css" href="{{ config('dynamic_filter.search_js_url', Resource::elixir('vendor/hnhdigital-os/laravel-dynamic-filter/search.css')) }}" defer>
 
