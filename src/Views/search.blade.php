@@ -82,10 +82,10 @@
       @if(!$setup->get('tab.search_pagination.hide', false))
       @capturestart
       <li style="float:right;padding-top:8px;text-align: center;">
-        <span class="search-buttons">
+        <span class="search-buttons" style="display: none;">
           <a class="search-result-first {!! ($result->get('left_arrow', false)) ? 'btn-primary btn-outline' : '' !!} fa fa-step-backward" aria-hidden="true" style="font-size:2em;padding: 0 5px 0 5px;" data-change-page="1"></a>
         </span>
-        <span class="search-buttons">
+        <span class="search-buttons" style="display: none;">
           <a class="search-result-up {!! ($result->get('left_arrow', false)) ? 'btn-primary btn-outline' : '' !!} fa fa-chevron-circle-left" aria-hidden="true" style="font-size:2em;padding: 0 5px 0 5px;" data-change-page="{!! $result->get('left_arrow_page', 0) !!}"></a>
         </span>
         <span style="display: none;">
@@ -98,10 +98,10 @@
             </ul>
           </span>
         </span>
-        <span class="search-buttons">
+        <span class="search-buttons" style="display: none;">
           <a class="search-result-down {!! ($result->get('right_arrow', false)) ? 'btn-primary btn-outline' : '' !!} fa fa-chevron-circle-right" aria-hidden="true" style="font-size:2em;padding: 0 5px 0 5px;" data-change-page="{!! $result->get('right_arrow_page', 0) !!}"></a>
         </span>
-        <span class="search-buttons">
+        <span class="search-buttons" style="display: none;">
           <a class="search-result-last {!! ($result->get('right_arrow', false)) ? 'btn-primary btn-outline' : '' !!} fa fa-step-forward" aria-hidden="true" style="font-size:2em;padding: 0 5px 0 5px;" data-change-page="{!! $result->get('search.filters.paginate_last_page', 0) !!}"></a>
         </span>
       </li>
