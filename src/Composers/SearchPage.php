@@ -122,9 +122,7 @@ class SearchPage
                 $mode_name = $setup->get('tab.search_filter.options.'.$setup->get('search.filters.mode', '0'), '');
             }
 
-            if ($setup->get('search.layout-style', '') == 'inline') {
-                $layout_div_class = 'row';
-            } else {
+            if ($setup->get('search.layout-style', '') != 'inline') {
                 $layout_div_class = 'wrapper wrapper-content animated fadeInRight';
             }
         } else {
