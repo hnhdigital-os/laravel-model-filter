@@ -47,29 +47,29 @@
   <div class="tabs-container">
     @if(!$setup->get('tab.hide', false))
     <ul class="nav nav-tabs">
-      <li class="active">
-        <a id="{!! $setup->get('search.name') !!}-tab1" class="tab-search-results" data-toggle="tab" href="#{!! $setup->get('search.name') !!}-tab-1">
+      <li class="nav-item" class="active">
+        <a class="nav-link active" id="{!! $setup->get('search.name') !!}-tab1" class="tab-search-results" data-toggle="tab" href="#{!! $setup->get('search.name') !!}-tab-1">
           <i class="fa fa-search"></i> {{ $setup->get('tab.search.title', 'Results') }}
         </a>
       </li>
       @if($setup->get('tab.advanced.show', false) && $setup->get('search.model', false) && !empty($filter_options))
-      <li>
-        <a id="{!! $setup->get('search.name') !!}-tab2" class="tab-search-advanced" data-toggle="tab" href="#{!! $setup->get('search.name') !!}-tab-2"><i class="fa fa-binoculars"></i>{{ $setup->get('tab.advanced.title', 'Advanced') }}</a>
+      <li class="nav-item">
+        <a class="nav-link tab-search-advanced" id="{!! $setup->get('search.name') !!}-tab2" data-toggle="tab" href="#{!! $setup->get('search.name') !!}-tab-2"><i class="fa fa-binoculars"></i>{{ $setup->get('tab.advanced.title', 'Advanced') }}</a>
       </li>
       @endif
       @if($setup->get('tab.selections.show', false))
-      <li>
-        <a id="{!! $setup->get('search.name') !!}-tab3" class="tab-search-selections" data-toggle="tab" href="#{!! $setup->get('search.name') !!}-tab-3"><i class="fa fa-dot-circle-o"></i>{{ $setup->get('tab.selections.title', 'Selections (0)') }}</a>
+      <li class="nav-item">
+        <a class="nav-link tab-search-selections"  id="{!! $setup->get('search.name') !!}-tab3" data-toggle="tab" href="#{!! $setup->get('search.name') !!}-tab-3"><i class="fa fa-dot-circle-o"></i>{{ $setup->get('tab.selections.title', 'Selections (0)') }}</a>
       </li>
       @endif
       @if($setup->get('tab.export.show', false))
-      <li>
-        <a id="{!! $setup->get('search.name') !!}-tab4" class="tab-search-export" data-toggle="tab" href="#{!! $setup->get('search.name') !!}-tab-4"><i class="fa fa-download"></i>{{ $setup->get('tab.export.title', 'Export') }}</a>
+      <li class="nav-item">
+        <a class="nav-link tab-search-export" id="{!! $setup->get('search.name') !!}-tab4" data-toggle="tab" href="#{!! $setup->get('search.name') !!}-tab-4"><i class="fa fa-download"></i>{{ $setup->get('tab.export.title', 'Export') }}</a>
       </li>
       @endif
       @if($setup->get('tab.search_filter.show', false))
-      <li class="dropdown search-filter-mode">
-        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{!! $mode_name !!}<span class="caret"></span></a>
+      <li class="nav-item dropdown search-filter-mode">
+        <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{!! $mode_name !!}<span class="caret"></span></a>
         {!! Html::input()->type('hidden')->name('mode')->addClass('search-field')->value($setup->get('search.filters.mode', '0')) !!}
         <ul class="dropdown-menu">
           @foreach($setup->get('tab.search_filter.options', []) as $item_id => $item_name)
@@ -78,10 +78,10 @@
         </ul>
       </li>
       @endif
-      <li class="search-count"><a href="#">{!! $result->get('count', 0) !!}</a></li>
+      <li class="nav-item search-count"><a class="nav-link" href="#">{!! $result->get('count', 0) !!}</a></li>
       @if(!$setup->get('tab.search_pagination.hide', false))
       @capturestart
-      <li style="float:right;padding-top:8px;text-align: center;">
+      <li class="nav-item">
         <span class="search-buttons" style="display: none;">
           <a class="search-result-first {!! ($result->get('left_arrow', false)) ? 'btn-primary btn-outline' : '' !!} fa fa-step-backward" aria-hidden="true" style="font-size:2em;padding: 0 5px 0 5px;" data-change-page="1"></a>
         </span>
