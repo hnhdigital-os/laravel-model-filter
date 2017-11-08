@@ -170,6 +170,9 @@ trait ControllerTrait
     private function getRelationQuery($model, $other_model, $method_source)
     {
         $method_name = camel_case($method_source);
+        if (method_exists($other_model, $method_name.'s')) {
+            $method_name .= 's';
+        }
         $relation = $other_model->$method_name();
 
         $relation_class = basename(str_replace('\\', '/', get_class($relation)));
