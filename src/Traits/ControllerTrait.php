@@ -136,9 +136,9 @@ trait ControllerTrait
 
                 $other_model = new $class_name();
 
-                $list = $this->getRelationQuery($model, $other_model, $method_source)->select($other_model->getTable().'.id')->pluck('id')->all();
+                $list = $this->getRelationQuery($model, $other_model, $method_source)->select($other_model->getTable().'.'.$other_model->getKeyName())->pluck($other_model->getKeyName())->all();
 
-                $query = $class_name::whereNotIn($other_model->getTable().'.id', $list);
+                $query = $class_name::whereNotIn($other_model->getTable().'.'.$other_model->getKeyName(), $list);
 
                 if (method_exists($query, 'onlyActive')) {
                     $query = $query->onlyActive();
@@ -171,6 +171,7 @@ trait ControllerTrait
     {
         $method_name = camel_case($method_source);
         $relation = $other_model->$method_name();
+
         $relation_class = basename(str_replace('\\', '/', get_class($relation)));
 
         switch ($relation_class) {
