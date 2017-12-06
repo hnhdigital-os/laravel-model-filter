@@ -96,7 +96,7 @@ trait ControllerTrait
         // Build query
         if ($search_tab == $attached_tab) {
             if (isset($attached_allocations)) {
-                return $attached_allocations;
+                $query = $attached_allocations;
             } else {
                 if (isset($attached_method_source)) {
                     return $model->$attached_method_source();
@@ -113,18 +113,19 @@ trait ControllerTrait
                 if (method_exists($query, 'onlyActive')) {
                     $query = $query->onlyActive();
                 }
-
-                if (isset($attached_model_filter) && $attached_model_filter instanceof \Closure) {
-                    $query = $attached_model_filter($query);
-                }
-
-                if ($model_filter instanceof \Closure) {
-                    $query = $model_filter($query);
-                }
             }
+
+            if (isset($attached_model_filter) && $attached_model_filter instanceof \Closure) {
+                $query = $attached_model_filter($query);
+            }
+
+            if ($model_filter instanceof \Closure) {
+                $query = $model_filter($query);
+            }
+                
         } elseif ($search_tab == $unattached_tab) {
             if (isset($unattached_allocations)) {
-                return $unattached_allocations;
+                $query = $unattached_allocations;
             } else {
                 if (isset($unattached_method_source)) {
                     return $model->$unattached_method_source();
@@ -143,14 +144,14 @@ trait ControllerTrait
                 if (method_exists($query, 'onlyActive')) {
                     $query = $query->onlyActive();
                 }
+            }
 
-                if (isset($unattached_model_filter) && $unattached_model_filter instanceof \Closure) {
-                    $query = $unattached_model_filter($query);
-                }
+            if (isset($unattached_model_filter) && $unattached_model_filter instanceof \Closure) {
+                $query = $unattached_model_filter($query);
+            }
 
-                if ($model_filter instanceof \Closure) {
-                    $query = $model_filter($query);
-                }
+            if ($model_filter instanceof \Closure) {
+                $query = $model_filter($query);
             }
         } else {
             return ['filters' => [], 'rows' => ''];
