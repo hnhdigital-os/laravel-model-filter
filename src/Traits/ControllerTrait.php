@@ -31,13 +31,13 @@ trait ControllerTrait
         }
 
         foreach ($settings_data as $key => $value) {
-                $options[str_replace('-', '_', $key)] = $value;
+            $options[str_replace('-', '_', $key)] = $value;
         }
 
         extract($options);
 
         $options['route_paramater'] = (empty($options['route_paramater'])) ? $current_model : $options['route_paramater'];
-        $options['route_prefix'] = (empty($options['route_prefix'])) ?  array_get($config, 0, '') : $options['route_prefix'];
+        $options['route_prefix'] = (empty($options['route_prefix'])) ? array_get($config, 0, '') : $options['route_prefix'];
 
         // Remove plural to get route paramater
         if (substr($options['route_paramater'], -1, 1) == 's') {
@@ -122,7 +122,6 @@ trait ControllerTrait
             if ($model_filter instanceof \Closure) {
                 $query = $model_filter($query);
             }
-                
         } elseif ($search_tab == $unattached_tab) {
             if (isset($unattached_allocations)) {
                 $query = $unattached_allocations;
