@@ -11,7 +11,8 @@
     ],
     "require": {
         "php": ">=7.0.0",
-        "hnhdigital-os/laravel-html-generator": "~1.0"
+        "hnhdigital-os/laravel-html-generator": "~1.0",
+        "hnhdigital-os/laravel-frontend-asset-loader": "~1.0",
     },
     "require-dev": {
         "phpunit/phpunit": "4.*",
