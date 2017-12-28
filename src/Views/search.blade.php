@@ -1,7 +1,7 @@
 @if(config('dynamic_filter.no_search_js', true))
-<script src="{{ config('dynamic_filter.search_js_url', Resource::elixir('vendor/hnhdigital-os/laravel-model-filter/search.js')) }}" defer></script>
+<script src="{{ config('dynamic_filter.search_js_url', FrontendAsset::elixir('vendor/hnhdigital-os/laravel-model-filter/search.js')) }}" defer></script>
 @endif
-<link rel="stylesheet" type="text/css" href="{{ config('dynamic_filter.search_js_url', Resource::elixir('vendor/hnhdigital-os/laravel-model-filter/search.css')) }}" defer>
+<link rel="stylesheet" type="text/css" href="{{ config('dynamic_filter.search_js_url', FrontendAsset::elixir('vendor/hnhdigital-os/laravel-model-filter/search.css')) }}" defer>
 
     @capturestart
     <p class="form-group">
@@ -39,10 +39,24 @@
 <div id="{!! $setup->get('search.name') !!}" data-search-request="{!! $setup->get('search.search_request') !!}" data-search-model="{!! $setup->get('search.model', '') !!}" data-search-controller="{!! $setup->get('search.controller', '') !!}" data-search-base="{!! $setup->get('search.base', '') !!}" data-search-method="{!! $setup->get('search.method', '') !!}" class="common-module-content-search {!! $layout_div_class !!}">
 @html(input()->type('hidden')->name('route')->addClass('search-field')->value(Route::current()->getName()))
 @if(isset($search_data['settings']))
-@forelse ($search_data['settings'] as $name => $value)
-@html(input()->type('hidden')->name($name)->addClass('search-field')->value($value))
-@empty
-@endforelse
+  @forelse ($search_data['settings'] as $name => $value)
+    @if(is_array($value))
+      @foreach($value as $name_1 => $value_1)
+        @if(is_array($value_1))          
+          @foreach($value_1 as $name_2 => $value_2)
+            @if(!is_array($value_2))
+              @html(input()->type('hidden')->name($name.'['.$name_1.']['.$name_2.']')->addClass('search-field')->value($value_2))
+            @endif
+          @endforeach
+        @else
+          @html(input()->type('hidden')->name($name.'['.$name_1.']')->addClass('search-field')->value($value_1))
+        @endif
+      @endforeach
+    @else
+    @html(input()->type('hidden')->name($name)->addClass('search-field')->value($value))
+    @endif
+  @empty
+  @endforelse
 @endif
   <div class="tabs-container">
     @if(!$setup->get('tab.hide', false))
