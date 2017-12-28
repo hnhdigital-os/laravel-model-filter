@@ -24,9 +24,20 @@ trait ControllerTrait
      */
     public function getCurrentSearchDetails($use_session, $settings, $options, $search_name)
     {
+        if (request()->ajax()) {
+            $settings_data = request()->all();
+        } else {
+            $settings_data = (array) $settings;
+        }
+
+        foreach ($settings_data as $key => $value) {
+                $options[str_replace('-', '_', $key)] = $value;
+        }
+
         extract($options);
 
         $options['route_paramater'] = (empty($options['route_paramater'])) ? $current_model : $options['route_paramater'];
+        $options['route_prefix'] = (empty($options['route_prefix'])) ?  array_get($config, 0, '') : $options['route_prefix'];
 
         // Remove plural to get route paramater
         if (substr($options['route_paramater'], -1, 1) == 's') {
@@ -62,17 +73,6 @@ trait ControllerTrait
         if (isset($settings) && is_array($settings)) {
             foreach ($settings as $key => $value) {
                 $options['search_request'][$key] = $value;
-            }
-        }
-
-        if (request()->ajax()) {
-            $settings_data = request()->all();
-        } else {
-            $settings_data = (array) $settings;
-        }
-        foreach ($settings_data as $key => $value) {
-            if (stripos($key, 'setting-') === 0) {
-                $options[str_replace('-', '_', $key)] = $value;
             }
         }
 
@@ -612,6 +612,7 @@ trait ControllerTrait
 
             $variable .= '_search';
             $method .= 'Search';
+            $search_settings['config'] = $config_entry;
 
             $search_result = $this->$method(false, $search_settings);
 
