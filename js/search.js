@@ -52,23 +52,25 @@ $(document).ready(function() {
     /* User clicks the remove button against a single applied filter */
     $('.common-module-content-search').on('keypress', '.form-control:not(.enable-on-enter)', function(e) {
       var search_table = $(this).parents('.common-module-content-search');
+      var search_table_id = search_table.attr('id');
       var keycode = (event.keyCode ? event.keyCode : event.which);
       if (keycode === 13) {
         e.preventDefault();
-        search_table.find('button[type=submit]').trigger('click');
+         $('#'+search_table_id+'-form button[type=submit]').trigger('click');
       }
     });
 
     /* User clicks the mode drop down */
     $('.common-module-content-search').on('click', '.search-filter-mode ul.dropdown-menu li a', function(e) {
         var search_table = $(this).parents('.common-module-content-search');
+        var search_table_id = search_table.attr('id');
         var mode_name = $(this).html()+'<span class="caret"></span>';
         var mode_value = $(this).data('mode');
         $(this).parents('.search-filter-mode').children('a.dropdown-toggle').html(mode_name);
         $(this).parents('.search-filter-mode').children('input.search-field').val(mode_value);
         search_table.find('.dropdown-menu li').show();
         search_table.find('.dropdown-menu li a[data-mode='+mode_value+']').parent('li').hide();
-        search_table.find('button[type=submit]').trigger('click');
+        $('#'+search_table_id+'-form button[type=submit]').trigger('click');
     });
 
     /* Hide the drop down option that is current */
@@ -286,6 +288,7 @@ $(document).ready(function() {
       var search_table = $(this).parents('.common-module-content-search');
       if (search_table.find('.search-items-per-page-pulldown').data('has-search')) {
         search_table.find('.search-buttons,.search-items-per-page-pulldown').show();
+        search_table.find('.secondary-pagination-buttons').show();
       }
     });
 
@@ -293,6 +296,7 @@ $(document).ready(function() {
       var search_table = $(this).parents('.common-module-content-search');
       if (!search_table.find('.search-items-per-page-pulldown').data('has-search')) {
         search_table.find('.search-buttons,.search-items-per-page-pulldown').hide();
+        search_table.find('.secondary-pagination-buttons').hide();
       }
     });
 
@@ -302,6 +306,7 @@ $(document).ready(function() {
       search_table.find('.search-buttons,.search-items-per-page-pulldown').hide();
       if (search_table.find('.search-buttons a').hasClass('btn-outline-primary')) {
         search_table.find('.search-buttons,.search-items-per-page-pulldown').show();
+        search_table.find('.secondary-pagination-buttons').show();
       }
     });
     

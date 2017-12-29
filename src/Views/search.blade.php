@@ -126,7 +126,7 @@
     </ul>
     @endif
     <div class="tab-content">
-      <div id="{!! $setup->get('search.name') !!}-tab-1" class="tab-pane active">
+      <div id="{!! $setup->get('search.name') !!}-tab-1" class="panel-body tab-pane active">
         <div class="table-responsive">
           <table class="table {!! $setup->get('table.classes', 'table-striped table-hover') !!}">
             <colgroup>
@@ -153,7 +153,7 @@
             </tbody>
           </table>
           @if(!$setup->get('tab.hide', false) && !$setup->get('tab.search_pagination.hide', false))
-          <div style="min-height:40px;">
+          <div class="secondary-pagination-buttons" style="min-height:40px;display:none;">
             <ul class="nav nav-tabs" style="display: table;margin: 0 auto;border:0;">
               @raw(echo $result_navigation)
             </ul>
@@ -163,28 +163,22 @@
       </div>
       @if($setup->get('tab.advanced.show', false) && $setup->get('search.model', false) && !empty($filter_options))
       <div id="{!! $setup->get('search.name') !!}-tab-2" class="tab-pane">
-        <div class="panel-body">
+        <div class="panel-body" style="padding:20px;">
           <div class="form-horizontal" class="p-t-md">
             <div class="form-group">
-              <label class="col-md-2 control-label">Saved filters:</label>
-              <div class="col-md-10">
-                <div class="input-group">
-                  {!! Html::select()->addClass('form-control action-load-filter init-select2')->style('width:100%;')->data('select2-placeholder', 'Load a saved filter from the list and apply to results:')->data('select2-allow-clear', true)->addOptionsArray($model_filter_options, 0, 1) !!}
-                  <span class="input-group-btn">
-                    <button type="button" class="btn btn-primary">Load</button>
-                  </span>
-                </div>
+              <div class="input-group">
+                {!! Html::select()->addClass('form-control action-load-filter init-select2')->style('width:100%;')->data('select2-placeholder', 'Load a saved filter from the list and apply to results:')->data('select2-allow-clear', true)->addOptionsArray($model_filter_options, 0, 1) !!}
+                <span class="input-group-btn">
+                  <button type="button" class="btn btn-sm btn-primary">@icon(sync) Load</button>
+                </span>
               </div>
             </div>
             <div class="form-group">
-              <label class="col-md-2 control-label">Available fields:</label>
-              <div class="col-md-10">
-                <div class="input-group">
-                  {!! Html::select()->addClass('form-control action-add-filter init-select2')->style('width:100%;')->data('select2-placeholder', 'Add a field from the list to filter results:')->data('select2-allow-clear', true)->addOptionsArray($filter_options, 0, 1) !!}
-                  <span class="input-group-btn">
-                    <button type="button" class="btn btn-primary">Add</button>
-                  </span>
-                </div>
+              <div class="input-group">
+                {!! Html::select()->addClass('form-control action-add-filter init-select2')->style('width:100%;')->data('select2-placeholder', 'Add a field from the list to filter results:')->data('select2-allow-clear', true)->addOptionsArray($filter_options, 0, 1) !!}
+                <span class="input-group-btn">
+                  <button type="button" class="btn btn-sm btn-primary">@icon(plus) Add</button>
+                </span>
               </div>
             </div>
             <div class="hr-line-dashed"></div>
@@ -209,16 +203,17 @@
               <?php $placeholder_count++; ?>
               @endif
             </div>
-            <div class="hr-line-dashed"></div>
-            <div class="form-group">
-              <div class="col-md-2">
-                <button class="btn btn-white action-cancel-filter" type="submit">Clear filters</button>
+            <div class="row">
+              <div class="col-3">
+                  @html(button(Html::icon('play').' Apply')->type('submit')->addClass('btn btn-sm btn-primary action-apply-filter ladda-button init-ladda')->data('style', 'expand-right'))
+                  @html(a(Html::icon('save').' Save filter')->addClass('btn btn-sm btn-info action-save-filter ladda-button init-ladda')->href('#action-save-filter')->data('style', 'expand-right')->data('toggle', 'modal'))
               </div>
-              <div class="col-md-7"></div>
-              <label class="col-md-3 control-label">
-                {!! Html::createElement('button')->type('submit')->addClass('btn btn-primary action-apply-filter ladda-button init-ladda')->text('Apply')->data('style', 'expand-right') !!}
-                {!! Html::createElement('a')->addClass('btn btn-info action-save-filter ladda-button init-ladda')->text('Save filter')->href('#action-save-filter')->data('style', 'expand-right')->data('toggle', 'modal') !!}
-              </label>
+              <div class="col-7"></div>
+              <div class="col-2" style="text-align: right;">
+                <label class="control-label">
+                  <button class="action-cancel-filter btn btn-sm btn-white" type="submit">@icon(ban) Clear filters</button>
+                </label>
+              </div>
             </div>
             @foreach($filter_types as $type)
             @include('dynamic_filter::filter', ['type' => $type, 'template' => true, 'filter_name' => '', 'filter_settings' => [], 'filter' => [], 'operator_options' => $operator_options[$type]])

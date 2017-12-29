@@ -20,3 +20,20 @@
 .common-module-content-search .table td {
     border:none;
 }
+
+.panel-body .common-module-content-search .panel-body {
+    border: none;
+    padding: 0;
+}
+
+.common-module-content-search .table tbody + tbody {
+    border: none;
+}
+
+.common-module-content-search .table {
+    margin-bottom: 0;
+}
+
+.common-module-content-search tbody.search td {
+    padding: 0;
+}
