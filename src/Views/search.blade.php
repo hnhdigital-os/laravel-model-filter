@@ -63,22 +63,22 @@
     <ul class="nav nav-tabs">
       <li class="nav-item" class="active">
         <a class="nav-link active" id="{!! $setup->get('search.name') !!}-tab1" class="tab-search-results" data-toggle="tab" href="#{!! $setup->get('search.name') !!}-tab-1">
-          <i class="fa fa-search"></i> {{ $setup->get('tab.search.title', 'Results') }}
+          <i class="fa fa-search fa-fw"></i> {{ $setup->get('tab.search.title', 'Results') }}
         </a>
       </li>
       @if($setup->get('tab.advanced.show', false) && $setup->get('search.model', false) && !empty($filter_options))
       <li class="nav-item">
-        <a class="nav-link tab-search-advanced" id="{!! $setup->get('search.name') !!}-tab2" data-toggle="tab" href="#{!! $setup->get('search.name') !!}-tab-2"><i class="fa fa-binoculars"></i>{{ $setup->get('tab.advanced.title', 'Advanced') }}</a>
+        <a class="nav-link tab-search-advanced" id="{!! $setup->get('search.name') !!}-tab2" data-toggle="tab" href="#{!! $setup->get('search.name') !!}-tab-2"><i class="fa fa-binoculars fa-fw"></i> {{ $setup->get('tab.advanced.title', 'Advanced') }}</a>
       </li>
       @endif
       @if($setup->get('tab.selections.show', false))
       <li class="nav-item">
-        <a class="nav-link tab-search-selections"  id="{!! $setup->get('search.name') !!}-tab3" data-toggle="tab" href="#{!! $setup->get('search.name') !!}-tab-3"><i class="fa fa-dot-circle-o"></i>{{ $setup->get('tab.selections.title', 'Selections (0)') }}</a>
+        <a class="nav-link tab-search-selections"  id="{!! $setup->get('search.name') !!}-tab3" data-toggle="tab" href="#{!! $setup->get('search.name') !!}-tab-3"><i class="fa fa-dot-circle-o fa-fw"></i> {{ $setup->get('tab.selections.title', 'Selections (0)') }}</a>
       </li>
       @endif
       @if($setup->get('tab.export.show', false))
       <li class="nav-item">
-        <a class="nav-link tab-search-export" id="{!! $setup->get('search.name') !!}-tab4" data-toggle="tab" href="#{!! $setup->get('search.name') !!}-tab-4"><i class="fa fa-download"></i>{{ $setup->get('tab.export.title', 'Export') }}</a>
+        <a class="nav-link tab-search-export" id="{!! $setup->get('search.name') !!}-tab4" data-toggle="tab" href="#{!! $setup->get('search.name') !!}-tab-4"><i class="fa fa-download fa-fw"></i> {{ $setup->get('tab.export.title', 'Export') }}</a>
       </li>
       @endif
       @if($setup->get('tab.search_filter.show', false))
@@ -94,13 +94,14 @@
       @endif
       <li class="nav-item search-count"><a class="nav-link" href="#">{!! $result->get('count', 0) !!}</a></li>
       @if(!$setup->get('tab.search_pagination.hide', false))
+      <div style="flex-grow: 1;"></div>
       @capturestart
-      <li class="nav-item">
+      <li class="nav-item f-right">
         <span class="search-buttons" style="display: none;">
-          <a class="search-result-first {!! ($result->get('left_arrow', false)) ? 'btn-primary btn-outline' : '' !!} fa fa-step-backward" aria-hidden="true" style="font-size:2em;padding: 0 5px 0 5px;" data-change-page="1"></a>
+          <a href="javascript::void(0)" class="search-result-first {!! ($result->get('left_arrow', false)) ? 'btn-outline-primary' : '' !!}" style="font-size:1.5em;padding: 0 5px 0 5px;" data-change-page="1">@icon(step-backward)</a>
         </span>
         <span class="search-buttons" style="display: none;">
-          <a class="search-result-up {!! ($result->get('left_arrow', false)) ? 'btn-primary btn-outline' : '' !!} fa fa-chevron-circle-left" aria-hidden="true" style="font-size:2em;padding: 0 5px 0 5px;" data-change-page="{!! $result->get('left_arrow_page', 0) !!}"></a>
+          <a href="javascript::void(0)" class="search-result-up {!! ($result->get('left_arrow', false)) ? 'btn-outline-primary' : '' !!} " style="font-size:1.5em;padding: 0 5px 0 5px;" data-change-page="{!! $result->get('left_arrow_page', 0) !!}">@icon(chevron-circle-left)</a>
         </span>
         <span style="display: none;">
           <span class="dropdown search-items-per-page-pulldown">
@@ -113,10 +114,10 @@
           </span>
         </span>
         <span class="search-buttons" style="display: none;">
-          <a class="search-result-down {!! ($result->get('right_arrow', false)) ? 'btn-primary btn-outline' : '' !!} fa fa-chevron-circle-right" aria-hidden="true" style="font-size:2em;padding: 0 5px 0 5px;" data-change-page="{!! $result->get('right_arrow_page', 0) !!}"></a>
+          <a href="javascript::void(0)" class="search-result-down {!! ($result->get('right_arrow', false)) ? 'btn-outline-primary' : '' !!}" style="font-size:1.5em;padding: 0 5px 0 5px;" data-change-page="{!! $result->get('right_arrow_page', 0) !!}">@icon(chevron-circle-right)</a>
         </span>
         <span class="search-buttons" style="display: none;">
-          <a class="search-result-last {!! ($result->get('right_arrow', false)) ? 'btn-primary btn-outline' : '' !!} fa fa-step-forward" aria-hidden="true" style="font-size:2em;padding: 0 5px 0 5px;" data-change-page="{!! $result->get('search.filters.paginate_last_page', 0) !!}"></a>
+          <a href="javascript::void(0)" class="search-result-last {!! ($result->get('right_arrow', false)) ? 'btn-outline-primary' : '' !!}" style="font-size:1.5em;padding: 0 5px 0 5px;" data-change-page="{!! $result->get('search.filters.paginate_last_page', 0) !!}">@icon(step-forward)</a>
         </span>
       </li>
       @capturestop("result_navigation")
@@ -153,7 +154,7 @@
           </table>
           @if(!$setup->get('tab.hide', false) && !$setup->get('tab.search_pagination.hide', false))
           <div style="min-height:40px;">
-            <ul class="nav nav-tabs" style="display: table;margin: 0 auto;">
+            <ul class="nav nav-tabs" style="display: table;margin: 0 auto;border:0;">
               @raw(echo $result_navigation)
             </ul>
           </div>

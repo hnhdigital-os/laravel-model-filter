@@ -129,10 +129,10 @@ $(document).ready(function() {
 
     /* User clicks the cancel button */
     $('.common-module-content-search').on('click', '.action-cancel-filter', function(e) {
-      var search_table_id = $(this).parents('.common-module-content-search').attr('id');
-      var search_table_container = $('#'+search_table_id);
-      search_table_container.find('.applied-filters .action-remove-row').trigger('click');
-      search_table_container.find('.search-filter-field').val('');
+      var search_table = $(this).parents('.common-module-content-search');
+      var search_table_id = search_table.attr('id');
+      search_table.find('.applied-filters .action-remove-row').trigger('click');
+      search_table.find('.search-filter-field').val('');
       $('#'+search_table_id+'-form button[type=submit]').trigger('click');
     });
 
@@ -212,18 +212,19 @@ $(document).ready(function() {
 
     /* User clicks an option in the available saved filters  */
     $('.common-module-content-search .action-load-filter').on('select2:select', function(e) {
-      var search_table_id = $(this).parents('.common-module-content-search').attr('id');
+      var search_table = $(this).parents('.common-module-content-search');
+      var search_table_id = search_table.attr('id');
       var selected_uuid = $(this).children('option:selected').val();
 
       var search_data = {
-        'model': $(this).parents('.common-module-content-search').data('search-model'),
-        'controller': $(this).parents('.common-module-content-search').data('search-controller'),
-        'method': $(this).parents('.common-module-content-search').data('search-method'),
-        'route' : search_table_container.find('[name=route]').val(),
-        'search-tab': search_table_container.find('[name=search-tab]').val()
+        'model': search_table.data('search-model'),
+        'controller': search_table.data('search-controller'),
+        'method': search_table.data('search-method'),
+        'route' : search_table.find('[name=route]').val(),
+        'search-tab': search_table.find('[name=search-tab]').val()
       };
 
-      $.ajax($(this).parents('.common-module-content-search').data('search-base') + '/' + selected_uuid + '/loadFilter?_method=POST', {
+      $.ajax(search_table.data('search-base') + '/' + selected_uuid + '/loadFilter?_method=POST', {
         data: search_data,
         beforeSend: function() {
           toastr.info('Loading filter...', '', {timeOut: 0});
@@ -257,16 +258,17 @@ $(document).ready(function() {
 
     /* User clicks the left or right button */
     $('.common-module-content-search').on('click', '.search-result-up,.search-result-first,.search-result-down,.search-result-last', function(e) {
-        if ($(this).hasClass('btn-primary btn-outline')) {
-            search_table_id = $(this).parents('.common-module-content-search').attr('id');
-            search_table_container.find('input.search-field[name=change_page]').val($(this).data('change-page'));
+        if ($(this).hasClass('btn-outline-primary')) {
+            var search_table = $(this).parents('.common-module-content-search');
+            var search_table_id = search_table.attr('id');
+            search_table.find('input.search-field[name=change_page]').val($(this).data('change-page'));
             $('#'+search_table_id+'-form button[type=submit]').trigger('click');
         }
     });
 
     $('.common-module-content-search').find('input,textarea,select,button').each(function() {
-        if ($(this).attr('form') == undefined) {
-          search_table_id = $(this).parents('.common-module-content-search').attr('id');
+        if ($(this).attr('form') == 'undefined') {
+          var search_table_id = $(this).parents('.common-module-content-search').attr('id');
           $(this).attr('form', search_table_id+'-form');
         }
         $(this).addClass('ignore');
@@ -274,7 +276,7 @@ $(document).ready(function() {
 
     $('.common-module-content-search .search').on('keydown', 'input', function (e) {
       if (e.keyCode == 13) {
-        search_table_id = $(this).parents('.common-module-content-search').attr('id');
+        var search_table_id = $(this).parents('.common-module-content-search').attr('id');
         $('#'+search_table_id+'-form button[type=submit]').trigger('click');
         return false;
       }
@@ -296,9 +298,9 @@ $(document).ready(function() {
 
     $('.common-module-content-search').each(function(e) {
       var search_table = $(this);
-      search_table.find('#'+search_table_id).find('li:first-child a[data-toggle=tab]').tab('show');
+      search_table.find('li:first-child a[data-toggle=tab]').tab('show');
       search_table.find('.search-buttons,.search-items-per-page-pulldown').hide();
-      if (search_table.find('.search-buttons a').hasClass('btn-primary')) {
+      if (search_table.find('.search-buttons a').hasClass('btn-outline-primary')) {
         search_table.find('.search-buttons,.search-items-per-page-pulldown').show();
       }
     });
@@ -316,71 +318,71 @@ var common_module_content_search = {
      */
     update: function(search_table_id, response)
     {
-        var search_table_container = $('#'+search_table_id);
+        var search_table = $('#'+search_table_id);
 
         if (typeof response.rows != 'undefined') {
             toastr.remove();
-            search_table_container.find('.search-header').html($H.build(response.rows.thead));
-            search_table_container.find('.search-result-rows').html($H.build(response.rows.tbody));
-            $('#'+search_table_id).trigger('common_module_content_search::update', [response]);
+            search_table.find('.search-header').html($H.build(response.rows.thead));
+            search_table.find('.search-result-rows').html($H.build(response.rows.tbody));
+            search_table.trigger('common_module_content_search::update', [response]);
             window.scrollTo(0, 0);
             $('#'+search_table_id+'-tab1').tab('show');
         }
 
         if (typeof response.count != 'undefined') {
-            search_table_container.find('.search-count a').html(response.count);
+            search_table.find('.search-count a').html(response.count);
         }
 
         if (typeof response.saved_filters != 'undefined') {
-            search_table_container.find('.action-load-filter').html($H.build(response.saved_filters));
-            search_table_container.find('.action-load-filter').trigger('change');
+            search_table.find('.action-load-filter').html($H.build(response.saved_filters));
+            search_table.find('.action-load-filter').trigger('change');
         }
 
         if (typeof response.advanced_filters != 'undefined') {
-            search_table_container.find('.applied-filters').html(response.advanced_filters);
+            search_table.find('.applied-filters').html(response.advanced_filters);
         }
 
         if (typeof response.lookup != 'undefined') {
-            search_table_container.find('input[name*=lookup_value1]').val(response.lookup);
+            search_table.find('input[name*=lookup_value1]').val(response.lookup);
         }
 
         if (typeof response.items_per_page != 'undefined') {
-            search_table_container.find('.search-items-per-page').html(response.items_per_page);
+            search_table.find('.search-items-per-page').html(response.items_per_page);
         }
 
         var has_search = false;
 
         if (typeof response.left_arrow != 'undefined') {
-            search_table_container.find('.search-result-up').data('change-page', response.left_arrow_page);
+            search_table.find('.search-result-up').data('change-page', response.left_arrow_page);
             if (response.left_arrow) {
-                search_table_container.find('.search-result-up').addClass('btn-primary btn-outline');
-                search_table_container.find('.search-result-first').addClass('btn-primary btn-outline');
+                search_table.find('.search-result-up').addClass('btn-outline-primary');
+                search_table.find('.search-result-first').addClass('btn-outline-primary');
                 has_search = true;
             } else {
-                search_table_container.find('.search-result-up').removeClass('btn-primary btn-outline');
-                search_table_container.find('.search-result-first').removeClass('btn-primary btn-outline');
+                search_table.find('.search-result-up').removeClass('btn-outline-primary');
+                search_table.find('.search-result-first').removeClass('btn-outline-primary');
             }
         }
         if (typeof response.right_arrow != 'undefined') {
-            search_table_container.find('.search-result-down').data('change-page', response.right_arrow_page);
+            search_table.find('.search-result-down').data('change-page', response.right_arrow_page);
             if (response.right_arrow) {
-                search_table_container.find('.search-result-down').addClass('btn-primary btn-outline');
-                search_table_container.find('.search-result-last').addClass('btn-primary btn-outline');
-                search_table_container.find('.search-result-last').data('change-page', response.search.paginate_last_page);
+                search_table.find('.search-result-down').addClass('btn-outline-primary');
+                search_table.find('.search-result-last').addClass('btn-outline-primary');
+                search_table.find('.search-result-last').data('change-page', response.search.paginate_last_page);
                 has_search = true;
             } else {
-                search_table_container.find('.search-result-down').removeClass('btn-primary btn-outline');
-                search_table_container.find('.search-result-last').removeClass('btn-primary btn-outline');
+                search_table.find('.search-result-down').removeClass('btn-outline-primary');
+                search_table.find('.search-result-last').removeClass('btn-outline-primary');
             }
         }
 
         if (has_search == false) {
-          search_table_container.find('.search-buttons,#'+search_table_id+' .search-items-per-page-pulldown').hide();
+          search_table.find('.search-buttons,#'+search_table_id+' .search-items-per-page-pulldown').hide();
         } else {
-          search_table_container.find('.search-buttons,#'+search_table_id+' .search-items-per-page-pulldown').show();
+          search_table.find('.search-buttons,#'+search_table_id+' .search-items-per-page-pulldown').show();
         }
 
-        search_table_container.find('.search-items-per-page-pulldown').data('has-search', has_search);
+        search_table.find('.search-items-per-page-pulldown').data('has-search', has_search);
 
         if (typeof $.ladda != 'undefined') {
             $.ladda('stopAll');
@@ -396,17 +398,17 @@ var common_module_content_search = {
      */
     getFilters: function(search_table_id)
     {
-        var search_table_container = $('#'+search_table_id);
+        var search_table = $('#'+search_table_id);
 
         var current_filters = {
           'filters': {}
         };
 
-        search_table_container.find('.search-field').each(function() {
+        search_table.find('.search-field').each(function() {
             current_filters[this.name] = $(this).val();
         });
 
-        search_table_container.find('.applied-filters .search-operator').each(function() {
+        search_table.find('.applied-filters .search-operator').each(function() {
             search_name = this.name.replace('_operator[]', '');
             search_operator = $(this).children('option:selected').val();
             search_value1 = $(this).parents('.form-group').find('.search-value1').val();
@@ -417,7 +419,7 @@ var common_module_content_search = {
             current_filters['filters'][search_name].push([search_operator, search_value1, search_value2]);
         });
 
-        search_table_container.find('.search-filter-field').each(function() {
+        search_table.find('.search-filter-field').each(function() {
             search_name = this.name.replace('_value1[]', '');
             search_value1 = $(this).val();
             if (typeof current_filters[search_name] == 'undefined') {

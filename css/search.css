@@ -5,7 +5,7 @@
     text-decoration: none !important;
 }
 
-.common-module-content-search .search-buttons a:not(.btn-primary),
+.common-module-content-search .search-buttons a:not(.btn-outline-primary),
 .common-module-content-search .search-items-per-page-pulldown a,
 .common-module-content-search .search-items-per-page-pulldown a:hover {
     color: rgb(167, 177, 194);
