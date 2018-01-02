@@ -325,13 +325,19 @@ trait ControllerTrait
                 }
 
                 if (count($filters)) {
-                    $row_html .= Html::div(
-                        Html::a('Save')->addClass('btn btn-xs btn-info action-save-filter')->href('#action-save-filter')->data('toggle', 'modal')
-                        .' '.
-                        Html::a('Change')->addClass('btn btn-xs btn-success action-change-filter')->scriptLink('Change')
-                        .' '.
-                        Html::a('Clear')->addClass('btn btn-xs btn-warning action-cancel-filter')->scriptLink('Cancel')
-                    )->addClass('pull-right');
+
+                    $config = array_get($search_request, 'config.5');
+
+                    $button_html = '';
+
+                    if (!isset($config['tab.hide']) && !isset($config['tab.advanced.show'])) {
+                        $button_html .= Html::a()->text('%s %s', Html::icon('save'), 'Save')->addClass('btn btn-sm btn-info action-save-filter')->href('#action-save-filter')->data('toggle', 'modal').' ';
+                        $button_html .= Html::a()->text('%s %s', Html::icon('save'), 'Change')->addClass('btn btn-sm btn-success action-change-filter')->scriptLink('Change').' ';
+                    }
+
+                    $button_html .= Html::a()->text('%s %s', Html::icon('ban'), 'Clear')->addClass('btn btn-sm btn-warning action-cancel-filter')->scriptLink('Cancel');
+
+                    $row_html .= Html::div($button_html)->addClass('pull-right');
                 }
 
                 if (!empty($row_html)) {
