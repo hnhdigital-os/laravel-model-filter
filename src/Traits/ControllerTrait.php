@@ -325,7 +325,6 @@ trait ControllerTrait
                 }
 
                 if (count($filters)) {
-
                     $config = array_get($search_request, 'config.5');
 
                     $button_html = '';
