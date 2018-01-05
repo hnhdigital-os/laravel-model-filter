@@ -34,7 +34,7 @@
     {!! Html::a('Close')->href('Close')->addClass('action-close-save-filter btn btn-default')->data('dismiss', 'modal') !!}
     @capturestop('modal_footer_left')
 
-@include('inspinia::module.content.modal', ['modal' => ['id' => 'action-save-filter', 'header_left' => 'Save '.$app_model_title.' Filter', 'content' => $modal_content, 'footer_left' => $modal_footer_left, 'footer_right' => $modal_footer_right]])
+@include('dynamic_filter::modal', ['modal' => ['id' => 'action-save-filter', 'header_left' => 'Save '.$app_model_title.' Filter', 'content' => $modal_content, 'footer_left' => $modal_footer_left, 'footer_right' => $modal_footer_right]])
 
 <div id="{!! $setup->get('search.name') !!}" data-search-request="{!! $setup->get('search.search_request') !!}" data-search-model="{!! $setup->get('search.model', '') !!}" data-search-controller="{!! $setup->get('search.controller', '') !!}" data-search-base="{!! $setup->get('search.base', '') !!}" data-search-method="{!! $setup->get('search.method', '') !!}" class="common-module-content-search {!! $layout_div_class !!}">
 @html(input()->type('hidden')->name('route')->addClass('search-field')->value(Route::current()->getName()))
