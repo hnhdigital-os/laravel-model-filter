@@ -393,7 +393,7 @@ var common_module_content_search = {
             $.ladda('stopAll');
         }
 
-        $('body').trigger('extensions::init', [$('#'+search_table_id)]);
+        $('body').trigger('extensions::init', [search_table]);
     },
 
     /**
